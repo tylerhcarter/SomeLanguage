@@ -94,14 +94,16 @@ public class LexicalParser implements Parser{
             if(keyword.getKeyword().equals(string))
                 return new Token(keyword.getTokenType(), string);
         }
-        return new Token(TokenType.UNDEFINED, string);
+        
+        throw new IllegalArgumentException("Input is not a valid keyword.");
 
     }
 
     private boolean isKeyword(String string) {
-        if(convertKeyword(string).getTokenType() != TokenType.UNDEFINED){
+        try{
+            convertKeyword(string);
             return true;
-        }else{
+        }catch(Exception ex){
             return false;
         }
     }
