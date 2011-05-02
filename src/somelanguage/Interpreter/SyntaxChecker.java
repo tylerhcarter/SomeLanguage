@@ -16,6 +16,7 @@ public class SyntaxChecker {
 
     public void run(ArrayList<Token> tokens) throws Exception{
 
+        tokens.add(new Token(TokenType.END_STATEMENT));
         this.scanner = new Scanner(tokens);
 
         // @todo to separate global and local scope, but allow references to each
@@ -26,29 +27,38 @@ public class SyntaxChecker {
             Token token = scanner.next();
 
             // Process individual statements
-
+            System.out.println("Processing Statements");
+            
             // Local Declaration
             if(token.getTokenType() == TokenType.LOCAL_DECLARE){
-                declareVariable(localScope);
-            }
 
+                System.out.println("Declaring Local Scope Variable");
+                declareVariable(localScope);
+                
+            }
+            
             // Global Declaration
             if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
+
+                System.out.println("Declaring Global Scope Variable");
                 declareVariable(globalScope);
+
             }
 
             // @todo somewhere around here we will need to process
             // function calls
             // Probably a good idea to treat functions the same as
             // variables, and variables with () are called
-
+            
             // Unencapsulated Strings are treated as variable names
             if(token.getTokenType() == TokenType.STRING){
+
+                System.out.println("Assigning Variable");
                 assignVariable(globalScope, localScope);
             }
 
         }
-
+        System.out.println("Finished");
         System.out.println(localScope);
 
     }
@@ -97,6 +107,7 @@ public class SyntaxChecker {
 
         // Get an Encapsulated String
         if(nextType == TokenType.QUOTE){
+            System.out.println("Retrieving Encapsulated String.");
             return getEncapsulatedString();
         }
 
@@ -106,10 +117,14 @@ public class SyntaxChecker {
             // Check if this is the only thing on the line
             if(scanner.next(2).getTokenType() == TokenType.END_STATEMENT){
 
+                System.out.println("Retrieving Integer");
+
                 // Good, we're done
                 return scanner.next().getTokenValue();
                 
             }else{
+
+                System.out.println("Retrieving Complex Integer");
 
                 // We have more processing to do
                 return evaluateOperation(localScope);
@@ -118,49 +133,11 @@ public class SyntaxChecker {
         }
 
         // Get a variable's value
-        else if(nextType == TokenType.STRING &&
-                scanner.next(2).getTokenType() == TokenType.END_STATEMENT){
+        else if(nextType == TokenType.STRING){
+            
+            System.out.println(nextType);
+            System.out.println("Retrieving Variable.");
             return localScope.getVariable(scanner.next().getTokenValue());
-        }
-
-        // @todo somewhere around here we will need to process
-        // function calls
-
-        // #todo we also need to handle mathmatical functions
-
-        // Error
-        else{
-            throw new Exception("Expecting " + TokenType.QUOTE);
-        }
-
-    }
-
-    private String getValue(Scope globalScope, Scope localScope) throws Exception{
-
-        TokenType nextType = scanner.next(false).getTokenType();
-
-        // Get an Encapsulated String
-        if(nextType == TokenType.QUOTE){
-            return getEncapsulatedString();
-        }
-
-        // Get Integer
-        else if(nextType == TokenType.INTEGER){
-            return scanner.next().getTokenValue();
-        }
-
-        // Get a variable's value
-        else if(nextType == TokenType.STRING &&
-                scanner.next(2).getTokenType() == TokenType.END_STATEMENT){
-            
-            String name = scanner.next().getTokenValue();
-
-            // Check if there is a local variable with this name
-            if(localScope.getVariable(name).equals("undefined")){
-                return globalScope.getVariable(name);
-            }else{
-                return localScope.getVariable(name);
-            }
             
         }
 
@@ -171,7 +148,9 @@ public class SyntaxChecker {
 
         // Error
         else{
-            throw new Exception("Expecting " + TokenType.QUOTE);
+
+            System.out.println("Throwing Exception.");
+            throw new Exception("Expecting " + TokenType.QUOTE + ". "  + nextType + " given.");
         }
 
     }
