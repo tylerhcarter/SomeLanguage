@@ -35,7 +35,7 @@ public class Main {
             checker.run(tokens);
             System.out.println("Finished Running");
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            System.out.println(ex);
         }
 
     }
