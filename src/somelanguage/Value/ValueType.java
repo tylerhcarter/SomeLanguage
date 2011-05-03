@@ -15,6 +15,6 @@ public enum ValueType {
     STRING,
     INTEGER,
     FUNCTION,
-    OBJECT
-
+    OBJECT,   
+    BOOLEAN
 }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
 import somelanguage.Scope;
+import somelanguage.Value.BooleanValue;
+import somelanguage.Value.FunctionValue;
 import somelanguage.Value.IntegerValue;
+import somelanguage.Value.NullValue;
 import somelanguage.Value.Value;
 import somelanguage.Value.ValueType;
 
@@ -15,7 +18,9 @@ import somelanguage.Value.ValueType;
 public class Math {
 
     public Value evaluate(ArrayList<Token> tokens, Scope scope) throws Exception{
-        
+
+        System.out.println(tokens);
+
         doBrackets(tokens, scope);
 
         doDivision(tokens, scope);
@@ -72,7 +77,7 @@ public class Math {
             Token token = tokens.get(i);
 
             // Check if this is a divider
-            if(token.getTokenType() == TokenType.ADD){
+            if(token.getTokenType() == TokenType.ASSIGNMENT){
 
                 // Check Left
                 if((i - 1) < 0){
@@ -88,8 +93,9 @@ public class Math {
 
                 // Divide and replace with new token
                 scope.setVariable(name, value);
-
+                
                 slice(tokens, i-1, i+1);
+                tokens.add(i - 1, new Token(TokenType.BOOLEAN, "true"));
 
                 i = 0;
 
@@ -291,18 +297,77 @@ public class Math {
         Token token = tokens.get(i);
         if(token.getTokenType() == TokenType.INTEGER){
             return new IntegerValue(Integer.parseInt(token.getTokenValue()));
-        }else{
+        }else if(token.getTokenType() == TokenType.STRING) {
 
             Value value = scope.getVariable(token.getTokenValue());
             if(value.getType() == ValueType.NULL){
                 throw new Exception("Undefined variable " + token.getTokenValue());
-            }else{
+            }
+            else{
                 return value;
+            }
+
+        }else if(token.getTokenType() == TokenType.BOOLEAN){
+
+            return new BooleanValue(token.getTokenValue());
+
+        }else if(token.getTokenType() == TokenType.FUNCTION){
+
+            Value v = getFunction(tokens);
+            return v;
+
+        }else{
+            System.out.println(tokens);
+            throw new Exception("Unexpected Token " + token.getTokenType());
+        }
+
+    }
+
+    public Value getFunction(ArrayList<Token> tokens) throws Exception{
+
+        for(int i = 0; i < tokens.size(); i++){
+
+            Token token = tokens.get(i);
+
+            // Look for opening brace
+            if(token.getTokenType() == TokenType.OPENBRACES){
+
+                // Get close brace
+                int closeBrace = getCloseBrace(tokens, i);
+                System.out.println(closeBrace);
+
+                // Get all braces between
+                ArrayList<Token> statement = slice(tokens, i, closeBrace);
+
+                // Return them as a function
+                return new FunctionValue(statement);
+
             }
 
         }
 
+        return new NullValue();
     }
+
+     private int getCloseBrace(ArrayList<Token> tokens, int openBracket) {
+
+        int scopeLevel = 1;
+        for(int i = openBracket + 1; i < tokens.size(); i++){
+            System.out.println(tokens.get(i).getTokenType());
+            if(tokens.get(i).getTokenType() == TokenType.OPENBRACES){
+                scopeLevel += 1;
+            }
+            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACES){
+
+                scopeLevel -= 1;
+                if(scopeLevel == 0)
+                    return i;
+            }
+
+        }
+
+        return -1;
+     }
 
 }
 

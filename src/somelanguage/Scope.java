@@ -17,6 +17,12 @@ public class Scope {
         
     }
 
+    public void addVariable(String name) {
+
+        addVariable(name, new NullValue());
+        
+    }
+
     public void addVariable(String name, Value value){
 
         int index = findVariable(name);

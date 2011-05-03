@@ -31,6 +31,8 @@ public class LexicalParser implements Parser{
 
         keywords.add(new Keyword("{", TokenType.OPENBRACES));
         keywords.add(new Keyword("}", TokenType.CLOSEBRACES));
+
+        keywords.add(new Keyword("function", TokenType.FUNCTION));
     }
 
     public ArrayList<Token> parse(String text) {

@@ -76,8 +76,18 @@ public class Scanner {
 
         int count = counter + 1;
         int start = counter + 1;
+
+        int scopeLevel = 0;
         while(count < this.tokens.size()){
-            if(this.tokens.get(count).getTokenType() == TokenType.END_STATEMENT){
+            if(this.tokens.get(count).getTokenType() == TokenType.OPENBRACES){
+                scopeLevel += 1;
+            }
+
+            if(this.tokens.get(count).getTokenType() == TokenType.CLOSEBRACES){
+                scopeLevel -= 1;
+            }
+
+            if(this.tokens.get(count).getTokenType() == TokenType.END_STATEMENT && scopeLevel == 0){
                 break;
             }
             count++;
