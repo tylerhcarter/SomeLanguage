@@ -3,35 +3,36 @@ package somelanguage;
 import java.util.ArrayList;
 import java.util.Collection;
 import somelanguage.Parser.Token;
+import somelanguage.Value.Value;
 
 /**
  *
  * @author Tyler(Chacha) chacha@chacha102.com
  */
 public class ComplexScope extends Scope {
-    public final Scope global;
-    public final Scope local;
+    public Scope global;
+    public StackBasedScope local;
 
-    public ComplexScope(Scope global, Scope local){
+    public ComplexScope(Scope global, StackBasedScope local){
         this.global = global;
         this.local = local;
     }
 
     @Override
-    public void addVariable(String name, String value){
+    public void addVariable(String name, Value value){
 
     }
 
     @Override
-    public void setVariable(String name, String value){
+    public void setVariable(String name, Value value){
 
         // First Try Local Scope
         if(!this.local.getVariable(name).equals("undefined")){
-            this.local.setVariable(name, value);
+            this.getLocal().setVariable(name, value);
         }
         // Otherwise global
         else{
-            this.global.setVariable(name, value);
+            this.getGlobal().setVariable(name, value);
         }
 
     }
@@ -41,25 +42,25 @@ public class ComplexScope extends Scope {
 
         // First Try Local Scope
         if(!this.local.getVariable(name).equals("undefined")){
-            this.local.deleteVariable(name);
+            this.getLocal().deleteVariable(name);
         }
         // Otherwise global
         else{
-            this.global.deleteVariable(name);
+            this.getGlobal().deleteVariable(name);
         }
 
     }
 
     @Override
-    public String getVariable(String name){
+    public Value getVariable(String name){
 
         // First Try Local Scope
         if(!this.local.getVariable(name).equals("undefined")){
-            return this.local.getVariable(name);
+            return this.getLocal().getVariable(name);
         }
         // Otherwise global
         else{
-            return this.global.getVariable(name);
+            return this.getGlobal().getVariable(name);
         }
 
     }
@@ -68,10 +69,38 @@ public class ComplexScope extends Scope {
     public String toString(){
 
         ArrayList<Variable> variables = new ArrayList<Variable>();
-        variables.addAll((Collection<Variable>)this.global.getVariables());
-        variables.addAll((Collection<Variable>)this.local.getVariables());
+        variables.addAll((Collection<Variable>)this.getGlobal().getVariables());
+        variables.addAll((Collection<Variable>)this.getLocal().getVariables());
         return variables.toString();
 
+    }
+
+    /**
+     * @return the global
+     */
+    public Scope getGlobal() {
+        return global;
+    }
+
+    /**
+     * @param global the global to set
+     */
+    public void setGlobal(Scope global) {
+        this.global = global;
+    }
+
+    /**
+     * @return the local
+     */
+    public StackBasedScope getLocal() {
+        return local;
+    }
+
+    /**
+     * @param local the local to set
+     */
+    public void setLocal(StackBasedScope local) {
+        this.local = local;
     }
 
 }

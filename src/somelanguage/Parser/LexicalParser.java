@@ -16,6 +16,7 @@ public class LexicalParser implements Parser{
         // Basic Keywords
         keywords.add(new Keyword("global", TokenType.GLOBAL_DECLARE));
         keywords.add(new Keyword("var", TokenType.LOCAL_DECLARE));
+        keywords.add(new Keyword("null", TokenType.NULL));
         keywords.add(new Keyword("=", TokenType.ASSIGNMENT));
         keywords.add(new Keyword(";", TokenType.END_STATEMENT));
 
@@ -58,7 +59,7 @@ public class LexicalParser implements Parser{
 
         if(string.endsWith("\"")){
             string = string.substring(0, string.length() - 1);
-            endBuffer.add(new Token(TokenType.QUOTE));
+            endBuffer.add(0, new Token(TokenType.QUOTE));
         }
 
         // Check that a string still exists
@@ -97,7 +98,7 @@ public class LexicalParser implements Parser{
 
         for(Keyword keyword:(Iterable<Keyword>)this.keywords){
             if(keyword.getKeyword().equals(string))
-                return new Token(keyword.getTokenType(), string);
+                return new Token(keyword.getTokenType());
         }
         
         throw new IllegalArgumentException("Input is not a valid keyword.");

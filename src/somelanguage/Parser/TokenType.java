@@ -30,4 +30,6 @@ public enum TokenType {
     END_STATEMENT,
     UNDEFINED,
 
+    NULL
+
 };

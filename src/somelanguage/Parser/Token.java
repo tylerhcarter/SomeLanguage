@@ -34,7 +34,10 @@ public class Token {
 
     @Override
     public String toString(){
-        return getTokenType() + ":" + getTokenValue();
+        if(getTokenValue().isEmpty()){
+            return getTokenType().toString();
+        }
+        return "(" + getTokenType().toString().toLowerCase() + ") " + getTokenValue();
     }
 
 }

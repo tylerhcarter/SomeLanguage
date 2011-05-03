@@ -2,6 +2,8 @@ package somelanguage;
 
 import java.util.ArrayList;
 import somelanguage.Parser.Token;
+import somelanguage.Value.NullValue;
+import somelanguage.Value.Value;
 
 /**
  *
@@ -9,13 +11,13 @@ import somelanguage.Parser.Token;
  */
 public class Scope {
 
-    private ArrayList<Variable> variables = new ArrayList<Variable>();
+    protected ArrayList<Variable> variables = new ArrayList<Variable>();
     
     public Scope(){
         
     }
 
-    public void addVariable(String name, String value){
+    public void addVariable(String name, Value value){
 
         int index = findVariable(name);
         if(index == -1){
@@ -30,7 +32,7 @@ public class Scope {
         
     }
 
-    public void setVariable(String name, String value){
+    public void setVariable(String name, Value value){
 
         int index = findVariable(name);
         if(index == -1){
@@ -69,11 +71,11 @@ public class Scope {
 
     }
 
-    public String getVariable(String name){
+    public Value getVariable(String name){
 
         Variable object = getVariableObject(name);
         if(object == null){
-            return "undefined";
+            return new NullValue();
         }else{
             return object.getValue();
         }

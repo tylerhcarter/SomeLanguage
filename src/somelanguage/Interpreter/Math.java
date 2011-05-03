@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
 import somelanguage.Scope;
+import somelanguage.Value.IntegerValue;
+import somelanguage.Value.Value;
+import somelanguage.Value.ValueType;
 
 /**
  *
@@ -11,7 +14,7 @@ import somelanguage.Scope;
  */
 public class Math {
 
-    public int evaluate(ArrayList<Token> tokens, Scope scope) throws Exception{
+    public Value evaluate(ArrayList<Token> tokens, Scope scope) throws Exception{
         
         doBrackets(tokens, scope);
 
@@ -20,17 +23,20 @@ public class Math {
         doSubtraction(tokens, scope);
         doAddition(tokens, scope);
 
+        doAssignment(tokens, scope);
+
         if(tokens.size() > 1){
+            System.out.println(tokens);
             throw new Exception("Badly Formed Expression.");
         }
 
-        return Integer.parseInt(tokens.get(0).getTokenValue());
+        return getToken(tokens, 0, scope);
     }
 
-    public int doBrackets(ArrayList<Token> expression, Scope scope) throws Exception{
+    public void doBrackets(ArrayList<Token> expression, Scope scope) throws Exception{
 
         if(expression.isEmpty())
-            return 0;
+            return;
 
         for(int i = 0; i < expression.size(); i++){
 
@@ -55,7 +61,42 @@ public class Math {
 
         }
 
-        return 0;
+        return;
+    }
+
+    public void doAssignment(ArrayList<Token> tokens, Scope scope) throws Exception{
+
+        // Loop through each token
+        for(int i = 1; i < tokens.size(); i++){
+
+            Token token = tokens.get(i);
+
+            // Check if this is a divider
+            if(token.getTokenType() == TokenType.ADD){
+
+                // Check Left
+                if((i - 1) < 0){
+                    throw new Exception ("Expected STRING, found ADD");
+                }
+                String name = tokens.get(i - 1).getTokenValue();
+
+                // Check Right
+                if((i + 1) >= tokens.size()){
+                    throw new Exception ("Expected INTEGER, found END_STATEMENT");
+                }
+                Value value = getToken(tokens, i+1, scope);
+
+                // Divide and replace with new token
+                scope.setVariable(name, value);
+
+                slice(tokens, i-1, i+1);
+
+                i = 0;
+
+            }
+
+        }
+
     }
 
     public void doAddition(ArrayList<Token> tokens, Scope scope) throws Exception{
@@ -72,13 +113,13 @@ public class Math {
                 if((i - 1) < 0){
                     throw new Exception ("Expected INTEGER, found ADD");
                 }
-                int numerator = getToken(tokens, i-1, scope);
+                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
                     throw new Exception ("Expected INTEGER, found END_STATEMENT");
                 }
-                int divisor = getToken(tokens, i+1, scope);
+                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
                 Token newToken = new Token(TokenType.INTEGER, (int)(numerator + divisor)+"");
@@ -108,13 +149,13 @@ public class Math {
                 if((i - 1) < 0){
                     throw new Exception ("Expected INTEGER, found SUBTRACT");
                 }
-                int numerator = getToken(tokens, i-1, scope);
+                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
                     throw new Exception ("Expected INTEGER, found END_STATEMENT");
                 }
-                int divisor = getToken(tokens, i+1, scope);
+                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
                 Token newToken = new Token(TokenType.INTEGER, (int)(numerator - divisor)+"");
@@ -144,13 +185,13 @@ public class Math {
                 if((i - 1) < 0){
                     throw new Exception ("Expected INTEGER, found MULTIPLY");
                 }
-                int numerator = getToken(tokens, i-1, scope);
+                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
                     throw new Exception ("Expected INTEGER, found END_STATEMENT");
                 }
-                int divisor = getToken(tokens, i+1, scope);
+                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
                 Token newToken = new Token(TokenType.INTEGER, (int)(numerator * divisor)+"");
@@ -181,13 +222,13 @@ public class Math {
                 if((i - 1) < 0){
                     throw new Exception ("Expected INTEGER, found DIVIDE");
                 }
-                int numerator = getToken(tokens, i-1, scope);
+                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
                     throw new Exception ("Expected INTEGER, found END_STATEMENT");
                 }
-                int divisor = getToken(tokens, i+1, scope);
+                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
                 Token newToken = new Token(TokenType.INTEGER, (int)(numerator / divisor)+"");
@@ -245,18 +286,18 @@ public class Math {
 
     }
 
-    private int getToken(ArrayList<Token> tokens, int i, Scope scope) throws Exception {
+    private Value getToken(ArrayList<Token> tokens, int i, Scope scope) throws Exception {
 
         Token token = tokens.get(i);
         if(token.getTokenType() == TokenType.INTEGER){
-            return Integer.parseInt(token.getTokenValue());
+            return new IntegerValue(Integer.parseInt(token.getTokenValue()));
         }else{
 
-            String value = scope.getVariable(token.getTokenValue());
-            if(value.equals("undefined")){
+            Value value = scope.getVariable(token.getTokenValue());
+            if(value.getType() == ValueType.NULL){
                 throw new Exception("Undefined variable " + token.getTokenValue());
             }else{
-                return Integer.parseInt(value);
+                return value;
             }
 
         }

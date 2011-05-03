@@ -10,7 +10,7 @@ import somelanguage.Parser.Token;
 import somelanguage.Parser.Parser;
 import somelanguage.Parser.LexicalParser;
 import java.util.ArrayList;
-import somelanguage.Interpreter.SyntaxChecker;
+import somelanguage.Interpreter.Runner;
 
 /**
  *
@@ -24,16 +24,14 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         Parser parser = new LexicalParser();
-        SyntaxChecker checker = new SyntaxChecker();
+        Runner checker = new Runner();
         
         try {
-            String text = readFile("H:/cha_java/SomeLanguage/src/somelanguage/file.txt");
+            String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
-            System.out.println("Finished Parsing");
             
             checker.run(tokens);
-            System.out.println("Finished Running");
         } catch (Exception ex) {
             throw ex;
         }
@@ -44,12 +42,22 @@ public class Main {
 
         while(true){
 
-            int index = text.indexOf("\r\n");
-            if(index == -1){
+            int returnIndex = text.indexOf("\r");
+            int newlineIndex = text.indexOf("\n");
+            int tabIndex = text.indexOf("\t");
+
+            int index;
+            if(returnIndex != -1){
+                index = returnIndex;
+            }else if(newlineIndex != -1){
+                index = newlineIndex;
+            }else if(tabIndex != -1){
+                index = tabIndex;
+            }else{
                 break;
             }
 
-            text = text.substring(0, index) + " " + text.substring(index + "\r\n".length());
+            text = text.substring(0, index) + " " + text.substring(index + "\r".length());
         }
 
         return text;

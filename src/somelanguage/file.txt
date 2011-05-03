@@ -1,3 +1,7 @@
-var a = 1;
-var b = 2;
-var c = 3;
+hello {
+    var d = "world";
+}
+
+var test = "hello";
+var meh = hello;
+var num = 5 + 1 + 5;
