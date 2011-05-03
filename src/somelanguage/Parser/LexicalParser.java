@@ -25,6 +25,8 @@ public class LexicalParser implements Parser{
         keywords.add(new Keyword("*", TokenType.MULTIPLY));
 
         keywords.add(new Keyword("\"", TokenType.QUOTE));
+        keywords.add(new Keyword("(", TokenType.OPENBRACKET));
+        keywords.add(new Keyword(")", TokenType.CLOSEBRACKET));
     }
 
     public ArrayList<Token> parse(String text) {

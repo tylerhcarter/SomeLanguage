@@ -27,12 +27,10 @@ public class SyntaxChecker {
             Token token = scanner.next();
 
             // Process individual statements
-            System.out.println("Processing Statements");
             
             // Local Declaration
             if(token.getTokenType() == TokenType.LOCAL_DECLARE){
 
-                System.out.println("Declaring Local Scope Variable");
                 declareVariable(localScope);
                 
             }
@@ -40,7 +38,6 @@ public class SyntaxChecker {
             // Global Declaration
             if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
 
-                System.out.println("Declaring Global Scope Variable");
                 declareVariable(globalScope);
 
             }
@@ -53,12 +50,11 @@ public class SyntaxChecker {
             // Unencapsulated Strings are treated as variable names
             if(token.getTokenType() == TokenType.STRING){
 
-                System.out.println("Assigning Variable");
                 assignVariable(globalScope, localScope);
             }
 
         }
-        System.out.println("Finished");
+
         System.out.println(localScope);
 
     }
@@ -107,7 +103,6 @@ public class SyntaxChecker {
 
         // Get an Encapsulated String
         if(nextType == TokenType.QUOTE){
-            System.out.println("Retrieving Encapsulated String.");
             return getEncapsulatedString();
         }
 
@@ -117,14 +112,10 @@ public class SyntaxChecker {
             // Check if this is the only thing on the line
             if(scanner.next(2).getTokenType() == TokenType.END_STATEMENT){
 
-                System.out.println("Retrieving Integer");
-
                 // Good, we're done
                 return scanner.next().getTokenValue();
                 
             }else{
-
-                System.out.println("Retrieving Complex Integer");
 
                 // We have more processing to do
                 return evaluateOperation(localScope);
@@ -135,8 +126,6 @@ public class SyntaxChecker {
         // Get a variable's value
         else if(nextType == TokenType.STRING){
             
-            System.out.println(nextType);
-            System.out.println("Retrieving Variable.");
             return localScope.getVariable(scanner.next().getTokenValue());
             
         }
@@ -149,7 +138,6 @@ public class SyntaxChecker {
         // Error
         else{
 
-            System.out.println("Throwing Exception.");
             throw new Exception("Expecting " + TokenType.QUOTE + ". "  + nextType + " given.");
         }
 
@@ -187,14 +175,14 @@ public class SyntaxChecker {
      * Scanner should return a scanner with the next X tokens in it, and advance
      * the current scanner to the end of it
      */
-    private String evaluateOperation(Scope localScope) {
+    private String evaluateOperation(Scope localScope) throws Exception {
 
         // Get next tokens
         Scanner operation = this.scanner.getTokenToEndStatement();
 
         Math math = new Math();
 
-        return math.evalute(operation.getTokens()) + "";
+        return math.evaluate(operation.getTokens(), localScope) + "";
     }
 
 }
