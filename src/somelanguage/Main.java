@@ -30,8 +30,15 @@ public class Main {
             String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
+
+            Scope globalScope = new Scope();
+            StackBasedScope localScope = new StackBasedScope();
+            localScope.addStack();
+
+            // Combines the two scopes
+            ComplexScope scope = new ComplexScope(globalScope, localScope);
             
-            checker.run(tokens);
+            checker.run(tokens, scope);
         } catch (Exception ex) {
             throw ex;
         }

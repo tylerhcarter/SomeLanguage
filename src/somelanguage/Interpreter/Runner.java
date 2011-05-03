@@ -17,31 +17,30 @@ import somelanguage.Value.Value;
  */
 public class Runner {
 
-    public void run(ArrayList<Token> tokens) throws Exception{
+    public void run(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
+        // Add a end statement to whatever we are working with
         tokens.add(new Token(TokenType.END_STATEMENT));
+
+        // Compile
+        Compiler compiler = new Compiler();
+        compiler.run(tokens, scope);
+
+        // Create a scanner
         Scanner scanner = new Scanner(tokens);
 
-        Scope globalScope = new Scope();
-        StackBasedScope localScope = new StackBasedScope();
-        localScope.addStack();
-
-        // Combines the two scopes
-        ComplexScope fullScope = new ComplexScope(globalScope, localScope);
-
-        Compiler compiler = new Compiler();
-
-        compiler.run(tokens, fullScope);
-        System.out.println(fullScope);
-
-        scanner.reset();
-
-        // Run File
+        // Run
         while(scanner.hasNext()){
-            
+
+            // Get Line
             Scanner statement = scanner.getTokenToEndStatement();
-            parseLine(statement, fullScope);
-            System.out.println(fullScope);
+
+            // Parse Line
+            parseLine(statement, scope);
+
+            // Feedback
+            System.out.println(scope);
+            
         }
 
 
@@ -51,85 +50,66 @@ public class Runner {
 
         Token token = statement.next(false);
 
-        if(token.getTokenType() == TokenType.CLOSEBRACES){
-            fullScope.local.removeStack();
+        // First Resolve Scope
+        if(token.getTokenType() == TokenType.CLOSEBRACES 
+                || token.getTokenType() == TokenType.OPENBRACES){
+
+            if(token.getTokenType() == TokenType.CLOSEBRACES)
+                fullScope.local.removeStack();
+            else
+                fullScope.local.addStack();
 
             // Scan past the bracket
             statement.next();
             token = statement.next(false);
             statement = statement.getTokenToEndStatement();
         }
-
-        if(token.getTokenType() == TokenType.OPENBRACES){
-            fullScope.local.addStack();
-
-            // Scan past the bracket
-            statement.next();
-            token = statement.next(false);
-            statement = statement.getTokenToEndStatement();
-        }
-
-        System.out.print(token.getTokenType() + " :");
-        System.out.println(statement.getTokens());
 
         // Local Declaration
         if(token.getTokenType() == TokenType.LOCAL_DECLARE){
 
-            declareVariable(statement, fullScope, true);
+            // Add variable to scope
+            String name = statement.next(2).getTokenValue();
+            declareVariable(name, fullScope, true);
+
+            // Trim statement
+            statement.next();
+            statement = statement.getTokenToEndStatement();
 
         }
 
         // Global Declaration
         if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
 
-            declareVariable(statement, fullScope, false);
+            // Add variable to scope
+            String name = statement.next(2).getTokenValue();
+            declareVariable(name, fullScope, true);
+
+            // Trim statement
+            statement.next();
+            statement = statement.getTokenToEndStatement();
 
         }
-        // @todo somewhere around here we will need to process
-        // function calls
-        // Probably a good idea to treat functions the same as
-        // variables, and variables with () are called
 
-        // Unencapsulated Strings are treated as variable names
-        if(token.getTokenType() == TokenType.STRING){
+        if(statement.getTokens().isEmpty())
+            return;
 
-            if(statement.next(2).getTokenType() == TokenType.ASSIGNMENT){
-                assignVariable(statement, fullScope);    
-            }else{
-                evaluateOperation(statement, fullScope);
-            }
-
-        }
+        evaluateOperation(statement, fullScope);
 
         
     }
 
-    private void declareVariable(Scanner scanner, ComplexScope scope) throws Exception{
-        declareVariable(scanner, scope, false);
+    private void declareVariable(String name, ComplexScope scope) throws Exception{
+        declareVariable(name, scope, false);
     }
 
-    private void declareVariable(Scanner scanner, ComplexScope scope, boolean local) throws Exception{
-
-        if(scanner.next(false).getTokenType() == TokenType.LOCAL_DECLARE || scanner.next(false).getTokenType() == TokenType.GLOBAL_DECLARE ){
-            scanner.next();
-        }
-
-        // Next token is the name
-        String name = scanner.next().getTokenValue();
-
-        // Check for assignment operator
-        if(scanner.next().getTokenType() != TokenType.ASSIGNMENT){
-            throw new Exception("Expecting Assignment Operator after '" + name +"', found" + scanner.getCurrent().getTokenType());
-        }
+    private void declareVariable(String name, ComplexScope scope, boolean local) throws Exception{
         
-        // Get the string
-        Value value = getValue(scanner.getTokenToEndStatement(), scope);
-
         if(local == true){
-            scope.getLocal().addVariable(name, value);
+            scope.getLocal().addVariable(name);
         }
         else{
-            scope.getGlobal().addVariable(name, value);
+            scope.getGlobal().addVariable(name);
         }
     }
 
