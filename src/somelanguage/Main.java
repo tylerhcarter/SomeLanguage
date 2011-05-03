@@ -21,7 +21,7 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Parser parser = new LexicalParser();
         SyntaxChecker checker = new SyntaxChecker();
@@ -35,7 +35,7 @@ public class Main {
             checker.run(tokens);
             System.out.println("Finished Running");
         } catch (Exception ex) {
-            System.out.println(ex);
+            throw ex;
         }
 
     }

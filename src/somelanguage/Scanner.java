@@ -23,6 +23,9 @@ public class Scanner {
     }
 
     public Token getCurrent(){
+        if(counter == -1)
+            return next();
+        
         return get(counter);
     }
 
@@ -31,6 +34,8 @@ public class Scanner {
     }
 
     public Token next(boolean advanceCounter){
+        if(!hasNext())
+            return new Token(TokenType.UNDEFINED);
 
         if(advanceCounter == true){
             counter++;
@@ -42,8 +47,10 @@ public class Scanner {
     }
 
     public Token next(int advance){
-        return get(counter + advance);
+        if((counter + advance) >= this.tokens.size())
+            return new Token(TokenType.UNDEFINED);
 
+        return get(counter + advance);
     }
 
     public ArrayList<Token> getTokens(){
@@ -55,24 +62,27 @@ public class Scanner {
         ArrayList<Token> subset = new ArrayList<Token>();
 
         for(int i = counter + 1; i <= counter + num; i++){
+            if(i >= this.tokens.size())
+                break;
+
             subset.add(get(i));
         }
 
-        counter = counter + num;
-
+        counter = counter + num + 1;
         return new Scanner(subset);
     }
 
     public Scanner getTokenToEndStatement(){
+
         int count = counter + 1;
+        int start = counter + 1;
         while(count < this.tokens.size()){
             if(this.tokens.get(count).getTokenType() == TokenType.END_STATEMENT){
                 break;
             }
             count++;
         }
-
-        return getTokens(count - (counter + 1));
+        return getTokens(count - start);
     }
 
     public boolean hasNext() {

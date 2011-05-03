@@ -1,6 +1,7 @@
 package somelanguage.Interpreter;
 
 import java.util.ArrayList;
+import somelanguage.ComplexScope;
 import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
 import somelanguage.Scanner;
@@ -12,33 +13,39 @@ import somelanguage.Scope;
  */
 public class SyntaxChecker {
 
-    private Scanner scanner;
-
     public void run(ArrayList<Token> tokens) throws Exception{
 
         tokens.add(new Token(TokenType.END_STATEMENT));
-        this.scanner = new Scanner(tokens);
+        Scanner scanner = new Scanner(tokens);
 
         // @todo to separate global and local scope, but allow references to each
         Scope globalScope = new Scope();
         Scope localScope = new Scope();
 
+        ComplexScope fullScope = new ComplexScope(globalScope, localScope);
+
         while(scanner.hasNext()){
-            Token token = scanner.next();
+            System.out.println("---");
+            
+            Token token = scanner.next(false);
 
             // Process individual statements
+            Scanner statement = scanner.getTokenToEndStatement();
+            
+            System.out.print(token.getTokenType() + " :");
+            System.out.println(statement.getTokens());
             
             // Local Declaration
             if(token.getTokenType() == TokenType.LOCAL_DECLARE){
 
-                declareVariable(localScope);
+                declareVariable(statement, fullScope, true);
                 
             }
             
             // Global Declaration
             if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
 
-                declareVariable(globalScope);
+                declareVariable(statement, fullScope, false);
 
             }
 
@@ -50,16 +57,26 @@ public class SyntaxChecker {
             // Unencapsulated Strings are treated as variable names
             if(token.getTokenType() == TokenType.STRING){
 
-                assignVariable(globalScope, localScope);
+                assignVariable(statement, fullScope);
             }
+
+            System.out.println("Scope: " + fullScope);
+
 
         }
 
-        System.out.println(localScope);
 
     }
 
-    private void declareVariable(Scope localScope) throws Exception{
+    private void declareVariable(Scanner scanner, ComplexScope scope) throws Exception{
+        declareVariable(scanner, scope, false);
+    }
+
+    private void declareVariable(Scanner scanner, ComplexScope scope, boolean local) throws Exception{
+
+        if(scanner.next(false).getTokenType() == TokenType.LOCAL_DECLARE || scanner.next(false).getTokenType() == TokenType.GLOBAL_DECLARE ){
+            scanner.next();
+        }
 
         // Next token is the name
         String name = scanner.next().getTokenValue();
@@ -70,64 +87,52 @@ public class SyntaxChecker {
         }
 
         // Get the string
-        String value = getValue(localScope);
+        String value = getValue(scanner.getTokenToEndStatement(), scope);
 
-        localScope.addVariable(name, value);
+        if(local == true){
+            scope.local.addVariable(name, value);
+        }
+        else{
+            scope.global.addVariable(name, value);
+        }
     }
 
-    private void assignVariable(Scope globalScope, Scope localScope) throws Exception {
+    private void assignVariable(Scanner scanner, Scope scope) throws Exception {
+
+        if(scanner.next(false).getTokenType() == TokenType.LOCAL_DECLARE || scanner.next(false).getTokenType() == TokenType.GLOBAL_DECLARE ){
+            scanner.next();
+        }
 
         // Current token is the name
         String name = scanner.getCurrent().getTokenValue();
-
+        
         // Check for assignment operator
         if(scanner.next().getTokenType() != TokenType.ASSIGNMENT){
             throw new Exception("Expecting Assignment Operator after '" + name +"', found" + scanner.getCurrent().getTokenType());
         }
 
         // Get the string
-        String value = getValue(localScope);
+        String value = getValue(scanner.getTokenToEndStatement(), scope);
 
         // Check if there is a local variable with this name
-        if(localScope.getVariable(name).equals("undefined")){
-            globalScope.setVariable(name, value);
-        }else{
-            localScope.setVariable(name, value);
-        }
+        scope.setVariable(name, value);
 
     }
 
-    private String getValue(Scope localScope) throws Exception{
-
+    private String getValue(Scanner scanner, Scope scope) throws Exception{
+        
         TokenType nextType = scanner.next(false).getTokenType();
 
         // Get an Encapsulated String
         if(nextType == TokenType.QUOTE){
-            return getEncapsulatedString();
+            return getEncapsulatedString(scanner);
         }
 
-        // Get Integer
-        else if(nextType == TokenType.INTEGER){
-
-            // Check if this is the only thing on the line
-            if(scanner.next(2).getTokenType() == TokenType.END_STATEMENT){
-
-                // Good, we're done
-                return scanner.next().getTokenValue();
-                
-            }else{
-
-                // We have more processing to do
-                return evaluateOperation(localScope);
-            }
-            
-        }
-
-        // Get a variable's value
-        else if(nextType == TokenType.STRING){
-            
-            return localScope.getVariable(scanner.next().getTokenValue());
-            
+        // Evaluate the Statement if it starts with a number, variable, or open brace
+        else if(nextType == TokenType.INTEGER 
+                || nextType == TokenType.STRING
+                || nextType == TokenType.OPENBRACKET){
+           return evaluateOperation(scanner.getTokenToEndStatement(), scope);
         }
 
         // @todo somewhere around here we will need to process
@@ -143,7 +148,7 @@ public class SyntaxChecker {
 
     }
 
-    private String getEncapsulatedString() throws Exception{
+    private String getEncapsulatedString(Scanner scanner) throws Exception{
 
         String value = "";
 
@@ -175,14 +180,14 @@ public class SyntaxChecker {
      * Scanner should return a scanner with the next X tokens in it, and advance
      * the current scanner to the end of it
      */
-    private String evaluateOperation(Scope localScope) throws Exception {
+    private String evaluateOperation(Scanner scanner, Scope scope) throws Exception {
 
         // Get next tokens
-        Scanner operation = this.scanner.getTokenToEndStatement();
+        Scanner operation = scanner.getTokenToEndStatement();
 
         Math math = new Math();
 
-        return math.evaluate(operation.getTokens(), localScope) + "";
+        return math.evaluate(operation.getTokens(), scope) + "";
     }
 
 }

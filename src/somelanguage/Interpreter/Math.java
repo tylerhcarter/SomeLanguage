@@ -13,7 +13,6 @@ public class Math {
 
     public int evaluate(ArrayList<Token> tokens, Scope scope) throws Exception{
         
-        System.out.println(tokens);
         doBrackets(tokens, scope);
 
         doDivision(tokens, scope);
@@ -52,7 +51,6 @@ public class Math {
 
                 // Evaluate the expression and insert it in place of the expression
                 expression.add(i, new Token(TokenType.INTEGER, evaluate(subExpression, scope) + ""));
-                System.out.println(expression);
             }
 
         }
@@ -65,14 +63,10 @@ public class Math {
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
 
-            System.out.println(tokens);
-
             Token token = tokens.get(i);
 
             // Check if this is a divider
             if(token.getTokenType() == TokenType.ADD){
-
-                System.out.println("Preforming");
 
                 // Check Left
                 if((i - 1) < 0){
@@ -105,14 +99,10 @@ public class Math {
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
 
-            System.out.println(tokens);
-
             Token token = tokens.get(i);
 
             // Check if this is a divider
             if(token.getTokenType() == TokenType.SUBTRACT){
-
-                System.out.println("Preforming");
 
                 // Check Left
                 if((i - 1) < 0){
@@ -145,14 +135,10 @@ public class Math {
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
 
-            System.out.println(tokens);
-
             Token token = tokens.get(i);
 
             // Check if this is a divider
             if(token.getTokenType() == TokenType.MULTIPLY){
-
-                System.out.println("Preforming");
 
                 // Check Left
                 if((i - 1) < 0){
@@ -186,14 +172,10 @@ public class Math {
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
 
-            System.out.println(tokens);
-
             Token token = tokens.get(i);
 
             // Check if this is a divider
             if(token.getTokenType() == TokenType.DIVIDE){
-
-                System.out.println("Preforming");
 
                 // Check Left
                 if((i - 1) < 0){

@@ -1,6 +1,7 @@
 package somelanguage;
 
 import java.util.ArrayList;
+import somelanguage.Parser.Token;
 
 /**
  *
@@ -95,6 +96,10 @@ public class Scope {
         String output = variables.toString();
         return output;
 
+    }
+
+    public ArrayList<Variable> getVariables() {
+        return variables;
     }
 
 }

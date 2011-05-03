@@ -19,6 +19,9 @@ public enum TokenType {
     OPENBRACKET,
     CLOSEBRACKET,
 
+    OPENBRACES,
+    CLOSEBRACES,
+
     INTEGER,
     STRING,
 
