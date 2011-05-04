@@ -1,9 +1,6 @@
 package somelanguage.Value;
 
 import java.util.ArrayList;
-import javax.xml.ws.handler.MessageContext.Scope;
-import somelanguage.ComplexScope;
-import somelanguage.Main;
 import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
 
