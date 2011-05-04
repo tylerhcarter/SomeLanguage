@@ -29,10 +29,7 @@ public class UserFunctionValue extends FunctionValue{
         }
         
         Value value = Main.runner.run(tokens, scope);
-        System.out.println(value);
         scope.local.removeStack();
-
-        System.out.println("Return Value: " + value);
 
         return value;
     }
