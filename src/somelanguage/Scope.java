@@ -1,7 +1,6 @@
 package somelanguage;
 
 import java.util.ArrayList;
-import somelanguage.Parser.Token;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.UndefinedValue;
 import somelanguage.Value.Value;
