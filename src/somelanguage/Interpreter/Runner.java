@@ -5,8 +5,6 @@ import somelanguage.ComplexScope;
 import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
 import somelanguage.Scanner;
-import somelanguage.Scope;
-import somelanguage.Value.MultiStringValue;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.ReturnValue;
 import somelanguage.Value.Value;
@@ -36,19 +34,12 @@ public class Runner {
             // Get Line
             Scanner statement = scanner.getTokenToEndStatement();
 
-            System.out.println(statement.getTokens());
-
             // Parse Line
             Value value = parseLine(statement, scope);
-
-            System.out.println("End Value: " + value);
 
             if(value.getType() == ValueType.RETURN){
                 return ((ReturnValue) value).getValue();
             }
-
-            // Feedback
-            System.out.println(scope);
             
         }
 
@@ -139,85 +130,6 @@ public class Runner {
         else{
             scope.getGlobal().addVariable(name);
         }
-    }
-
-    private void assignVariable(Scanner scanner, ComplexScope scope) throws Exception {
-
-        if(scanner.next(false).getTokenType() == TokenType.LOCAL_DECLARE || scanner.next(false).getTokenType() == TokenType.GLOBAL_DECLARE ){
-            scanner.next();
-        }
-
-        // Current token is the name
-        String name = scanner.getCurrent().getTokenValue();
-        
-        // Check for assignment operator
-        if(scanner.next().getTokenType() != TokenType.ASSIGNMENT){
-            throw new Exception("Expecting Assignment Operator after '" + name +"', found" + scanner.getCurrent().getTokenType());
-        }
-
-        // Get the string
-        Value value = getValue(scanner.getTokenToEndStatement(), scope);
-
-        // Check if there is a local variable with this name
-        scope.setVariable(name, value);
-
-    }
-
-    private Value getValue(Scanner scanner, ComplexScope scope) throws Exception{
-        
-        TokenType nextType = scanner.next(false).getTokenType();
-
-        // Get an Encapsulated String
-        if(nextType == TokenType.QUOTE){
-            return getEncapsulatedString(scanner);
-        }
-
-        else if(nextType == TokenType.NULL){
-            return new NullValue();
-        }
-
-        // Evaluate the Statement if it starts with a number, variable, or open brace
-        else if(nextType == TokenType.INTEGER 
-                || nextType == TokenType.STRING
-                || nextType == TokenType.OPENBRACKET){
-           return evaluateOperation(scanner.getTokenToEndStatement(), scope);
-        }
-
-        // @todo somewhere around here we will need to process
-        // function calls
-
-        // #todo we also need to handle mathmatical functions
-
-        // Error
-        else{
-            throw new Exception("Unexpected Token " + nextType);
-        }
-
-    }
-
-    private Value getEncapsulatedString(Scanner scanner) throws Exception{
-
-        MultiStringValue value = new MultiStringValue("");
-
-        // First get open string
-        if(scanner.next().getTokenType() != TokenType.QUOTE){
-            throw new Exception("Expect Quote. Found " + scanner.getCurrent().getTokenType());
-        }
-        
-        // Get all values until close quote
-        while(scanner.hasNext()){
-
-            Token t = scanner.next();
-            if(t.getTokenType() == TokenType.QUOTE){
-                break;
-            }
-
-            value.add(t.getTokenValue());
-
-        }
-
-        return value;
-
     }
 
     /*
