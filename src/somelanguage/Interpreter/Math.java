@@ -21,24 +21,14 @@ public class Math {
 
     public Value evaluate(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
-        System.out.println("---- Start Evaluating ----");
-
         if(tokens.isEmpty())
             return new NullValue();
 
-        System.out.println("Before: " + tokens);
-
         doFunctionCompile(tokens, scope);
-
-        System.out.println("Compile: " + tokens);
 
         doFunctionCalls(tokens, scope);
 
-        System.out.println("Parse: " + tokens);
-
         doBrackets(tokens, scope);
-
-        System.out.println("Post: " + tokens);
 
         doDivision(tokens, scope);
         doMultiplication(tokens, scope);
@@ -51,8 +41,6 @@ public class Math {
         if(tokens.size() > 1){
             throw new Exception("Badly Formed Expression.");
         }
-
-        System.out.println("---- End Evaluating ----");
 
         return getToken(tokens, 0, scope);
     }
