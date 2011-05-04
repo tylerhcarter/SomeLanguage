@@ -1,7 +1,5 @@
-hello {
-    var d = "world";
-}
+var subtract = function {
+    return argument1 - 50;
+};
 
-var test = "hello";
-var meh = hello;
-var num = 5 + 1 + 5;
+return subtract ( 61 );

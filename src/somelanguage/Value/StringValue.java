@@ -1,5 +1,8 @@
 package somelanguage.Value;
 
+import somelanguage.Parser.Token;
+import somelanguage.Parser.TokenType;
+
 /**
  *
  * @author tylercarter
@@ -22,6 +25,11 @@ public class StringValue extends Value{
 
     public String toString(){
         return this.value;
+    }
+
+    @Override
+    public Token toToken() {
+        return new Token(TokenType.STRING, this.value);
     }
 
 }

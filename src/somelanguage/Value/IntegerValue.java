@@ -1,5 +1,8 @@
 package somelanguage.Value;
 
+import somelanguage.Parser.Token;
+import somelanguage.Parser.TokenType;
+
 /**
  *
  * @author tylercarter
@@ -26,6 +29,11 @@ public class IntegerValue extends Value{
 
     public String toString(){
         return this.value + "";
+    }
+
+    @Override
+    public Token toToken() {
+        return new Token(TokenType.INTEGER, this.value + "");
     }
 
 }

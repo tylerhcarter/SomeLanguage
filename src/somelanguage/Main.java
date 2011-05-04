@@ -11,6 +11,7 @@ import somelanguage.Parser.Parser;
 import somelanguage.Parser.LexicalParser;
 import java.util.ArrayList;
 import somelanguage.Interpreter.Runner;
+import somelanguage.Value.Value;
 
 /**
  *
@@ -18,13 +19,16 @@ import somelanguage.Interpreter.Runner;
  */
 public class Main {
 
+    public static Runner runner;
+    public static ComplexScope scope;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
 
         Parser parser = new LexicalParser();
-        Runner checker = new Runner();
+        Main.runner = new Runner();
         
         try {
             String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
@@ -36,9 +40,10 @@ public class Main {
             localScope.addStack();
 
             // Combines the two scopes
-            ComplexScope scope = new ComplexScope(globalScope, localScope);
+            Main.scope = new ComplexScope(globalScope, localScope);
             
-            checker.run(tokens, scope);
+            Value value = Main.runner.run(tokens, Main.scope);
+            System.out.println("Final Value: " + value);
         } catch (Exception ex) {
             throw ex;
         }

@@ -1,5 +1,7 @@
 package somelanguage.Value;
 
+import somelanguage.Parser.Token;
+
 /**
  *
  * @author tylercarter
@@ -11,5 +13,7 @@ public abstract class Value {
     public String toString(){
         return getType() + "";
     }
+
+    public abstract Token toToken();
 
 }

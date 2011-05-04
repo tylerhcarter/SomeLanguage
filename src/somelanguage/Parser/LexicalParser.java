@@ -25,6 +25,8 @@ public class LexicalParser implements Parser{
         keywords.add(new Keyword("/", TokenType.DIVIDE));
         keywords.add(new Keyword("*", TokenType.MULTIPLY));
 
+        keywords.add(new Keyword(",", TokenType.COMMA));
+
         keywords.add(new Keyword("\"", TokenType.QUOTE));
         keywords.add(new Keyword("(", TokenType.OPENBRACKET));
         keywords.add(new Keyword(")", TokenType.CLOSEBRACKET));
@@ -33,6 +35,7 @@ public class LexicalParser implements Parser{
         keywords.add(new Keyword("}", TokenType.CLOSEBRACES));
 
         keywords.add(new Keyword("function", TokenType.FUNCTION));
+        keywords.add(new Keyword("return", TokenType.RETURN));
     }
 
     public ArrayList<Token> parse(String text) {
@@ -76,7 +79,8 @@ public class LexicalParser implements Parser{
         if(isKeyword(string)){
 
             // Add Keyword Token
-            this.tokens.add(convertKeyword(string));
+            Token token = convertKeyword(string);
+            this.tokens.add(token);
             
         }
         else if(isInteger(string)){

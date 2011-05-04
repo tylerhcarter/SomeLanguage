@@ -5,6 +5,9 @@
 
 package somelanguage.Value;
 
+import somelanguage.Parser.Token;
+import somelanguage.Parser.TokenType;
+
 /**
  *
  * @author tylercarter
@@ -31,6 +34,11 @@ public class BooleanValue extends Value {
     @Override
     public ValueType getType() {
         return ValueType.BOOLEAN;
+    }
+
+    @Override
+    public Token toToken() {
+        return new Token(TokenType.BOOLEAN);
     }
 
 }

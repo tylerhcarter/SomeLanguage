@@ -3,6 +3,7 @@ package somelanguage;
 import java.util.ArrayList;
 import somelanguage.Parser.Token;
 import somelanguage.Value.NullValue;
+import somelanguage.Value.UndefinedValue;
 import somelanguage.Value.Value;
 
 /**
@@ -81,7 +82,7 @@ public class Scope {
 
         Variable object = getVariableObject(name);
         if(object == null){
-            return new NullValue();
+            return new UndefinedValue();
         }else{
             return object.getValue();
         }

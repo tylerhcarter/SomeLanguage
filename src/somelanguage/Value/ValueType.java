@@ -16,5 +16,7 @@ public enum ValueType {
     INTEGER,
     FUNCTION,
     OBJECT,   
-    BOOLEAN
+    BOOLEAN,
+    RETURN,
+    UNDEFINED
 }

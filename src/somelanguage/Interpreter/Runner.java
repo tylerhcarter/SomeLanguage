@@ -6,10 +6,11 @@ import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
 import somelanguage.Scanner;
 import somelanguage.Scope;
-import somelanguage.StackBasedScope;
 import somelanguage.Value.MultiStringValue;
 import somelanguage.Value.NullValue;
+import somelanguage.Value.ReturnValue;
 import somelanguage.Value.Value;
+import somelanguage.Value.ValueType;
 
 /**
  *
@@ -17,7 +18,7 @@ import somelanguage.Value.Value;
  */
 public class Runner {
 
-    public void run(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    public Value run(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Add a end statement to whatever we are working with
         tokens.add(new Token(TokenType.END_STATEMENT));
@@ -35,18 +36,31 @@ public class Runner {
             // Get Line
             Scanner statement = scanner.getTokenToEndStatement();
 
+            System.out.println(statement.getTokens());
+
             // Parse Line
-            parseLine(statement, scope);
+            Value value = parseLine(statement, scope);
+
+            System.out.println("End Value: " + value);
+
+            if(value.getType() == ValueType.RETURN){
+                return ((ReturnValue) value).getValue();
+            }
 
             // Feedback
             System.out.println(scope);
             
         }
 
+        // No return value returns null
+        return new NullValue();
+
 
     }
 
-    private void parseLine(Scanner statement, ComplexScope fullScope) throws Exception{
+    private Value parseLine(Scanner statement, ComplexScope fullScope) throws Exception{
+
+        boolean returnValue = false;
 
         Token token = statement.next(false);
 
@@ -83,7 +97,7 @@ public class Runner {
 
             // Add variable to scope
             String name = statement.next(2).getTokenValue();
-            declareVariable(name, fullScope, true);
+            declareVariable(name, fullScope, false);
 
             // Trim statement
             statement.next();
@@ -91,11 +105,25 @@ public class Runner {
 
         }
 
+        // Return Value
+        if(token.getTokenType() == TokenType.RETURN){
+            returnValue = true;
+
+            // Trim statement
+            statement.next();
+            statement = statement.getTokenToEndStatement();
+        }
+
         if(statement.getTokens().isEmpty())
-            return;
+            return new NullValue();
 
-        evaluateOperation(statement, fullScope);
+        Value value =  evaluateOperation(statement, fullScope);
 
+        if(returnValue == true){
+            value = new ReturnValue(value);
+        }
+
+        return value;
         
     }
 
@@ -113,7 +141,7 @@ public class Runner {
         }
     }
 
-    private void assignVariable(Scanner scanner, Scope scope) throws Exception {
+    private void assignVariable(Scanner scanner, ComplexScope scope) throws Exception {
 
         if(scanner.next(false).getTokenType() == TokenType.LOCAL_DECLARE || scanner.next(false).getTokenType() == TokenType.GLOBAL_DECLARE ){
             scanner.next();
@@ -135,7 +163,7 @@ public class Runner {
 
     }
 
-    private Value getValue(Scanner scanner, Scope scope) throws Exception{
+    private Value getValue(Scanner scanner, ComplexScope scope) throws Exception{
         
         TokenType nextType = scanner.next(false).getTokenType();
 
@@ -199,7 +227,7 @@ public class Runner {
      * Scanner should return a scanner with the next X tokens in it, and advance
      * the current scanner to the end of it
      */
-    private Value evaluateOperation(Scanner scanner, Scope scope) throws Exception {
+    private Value evaluateOperation(Scanner scanner, ComplexScope scope) throws Exception {
 
         // Get next tokens
         Scanner operation = scanner.getTokenToEndStatement();

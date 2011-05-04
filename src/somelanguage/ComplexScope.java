@@ -2,8 +2,8 @@ package somelanguage;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import somelanguage.Parser.Token;
 import somelanguage.Value.Value;
+import somelanguage.Value.ValueType;
 
 /**
  *
@@ -27,7 +27,7 @@ public class ComplexScope extends Scope {
     public void setVariable(String name, Value value){
 
         // First Try Local Scope
-        if(!this.local.getVariable(name).equals("undefined")){
+        if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
             this.getLocal().setVariable(name, value);
         }
         // Otherwise global
@@ -41,7 +41,7 @@ public class ComplexScope extends Scope {
     public void deleteVariable(String name){
 
         // First Try Local Scope
-        if(!this.local.getVariable(name).equals("undefined")){
+        if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
             this.getLocal().deleteVariable(name);
         }
         // Otherwise global
@@ -53,9 +53,9 @@ public class ComplexScope extends Scope {
 
     @Override
     public Value getVariable(String name){
-
+        
         // First Try Local Scope
-        if(!this.local.getVariable(name).equals("undefined")){
+        if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
             return this.getLocal().getVariable(name);
         }
         // Otherwise global

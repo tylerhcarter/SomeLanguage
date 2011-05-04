@@ -22,6 +22,8 @@ public enum TokenType {
     OPENBRACES,
     CLOSEBRACES,
 
+    COMMA,
+
     INTEGER,
     STRING,
 
@@ -33,5 +35,6 @@ public enum TokenType {
     NULL,
     BOOLEAN,
 
-    FUNCTION
+    FUNCTION,
+    RETURN
 };

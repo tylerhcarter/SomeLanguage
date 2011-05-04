@@ -2,12 +2,9 @@ package somelanguage.Interpreter;
 
 import java.util.ArrayList;
 import somelanguage.ComplexScope;
-import somelanguage.Scope;
 import somelanguage.Parser.Token;
 import somelanguage.Parser.TokenType;
-import somelanguage.Scanner;
-import somelanguage.Value.FunctionValue;
-import somelanguage.Value.Value;
+import somelanguage.Value.UserFunctionValue;
 
 /**
  *
@@ -34,7 +31,7 @@ public class Compiler {
                     
                     ArrayList<Token> statement = slice(tokens, i, closeBrace);
                     
-                    scope.local.addVariable(name, new FunctionValue(statement));
+                    scope.local.addVariable(name, new UserFunctionValue(statement));
 
             }
 
