@@ -35,7 +35,6 @@ public class Math {
         doSubtraction(tokens, scope);
         doAddition(tokens, scope);
 
-
         doAssignment(tokens, scope);
 
         if(tokens.size() > 1){
@@ -141,7 +140,7 @@ public class Math {
         return;
     }
 
-    public void doAssignment(ArrayList<Token> tokens, Scope scope) throws Exception{
+    public void doAssignment(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
@@ -178,7 +177,7 @@ public class Math {
 
     }
 
-    public void doAddition(ArrayList<Token> tokens, Scope scope) throws Exception{
+    public void doAddition(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
@@ -214,7 +213,7 @@ public class Math {
         
     }
 
-    public void doSubtraction(ArrayList<Token> tokens, Scope scope) throws Exception{
+    public void doSubtraction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
@@ -250,7 +249,7 @@ public class Math {
 
     }
 
-    public void doMultiplication(ArrayList<Token> tokens, Scope scope) throws Exception{
+    public void doMultiplication(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
@@ -287,7 +286,7 @@ public class Math {
 
     }
 
-    public void doDivision(ArrayList<Token> tokens, Scope scope) throws Exception{
+    public void doDivision(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
@@ -344,10 +343,10 @@ public class Math {
 
     }
 
-    private Value getToken(ArrayList<Token> tokens, int i, Scope scope) throws Exception {
+    private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
 
         Token token = tokens.get(i);
-        
+
         if(token.getTokenType() == TokenType.INTEGER){
             return new IntegerValue(Integer.parseInt(token.getTokenValue()));
         }else if(token.getTokenType() == TokenType.STRING) {
@@ -366,7 +365,7 @@ public class Math {
 
         }else if(token.getTokenType() == TokenType.FUNCTION){
 
-            Value v = getFunction(tokens);
+            Value v = getFunction(tokens, scope);
             
             return v;
 
@@ -388,8 +387,8 @@ public class Math {
 
             if(token.getTokenType() == TokenType.FUNCTION){
 
-                Value value = getFunction(tokens);
-                String name = "func" + value.hashCode();
+                Value value = getFunction(tokens, scope);
+                String name = ((FunctionValue) value).getName();
                 scope.global.addVariable(name, value);
 
                 tokens.add(i, new Token(TokenType.STRING, name));
@@ -400,7 +399,7 @@ public class Math {
 
     }
 
-    public Value getFunction(ArrayList<Token> tokens) throws Exception{
+    public Value getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         for(int i = 0; i < tokens.size(); i++){
 
@@ -418,7 +417,7 @@ public class Math {
                 statement.remove(0);
 
                 // Return them as a function
-                return new UserFunctionValue(statement);
+                return new UserFunctionValue(statement, scope);
 
             }
 

@@ -13,7 +13,8 @@ public class ComplexScope extends Scope {
     public Scope global;
     public StackBasedScope local;
 
-    public ComplexScope(Scope global, StackBasedScope local){
+    public ComplexScope(String name, Scope global, StackBasedScope local){
+        super(name);
         this.global = global;
         this.local = local;
     }
@@ -28,6 +29,7 @@ public class ComplexScope extends Scope {
 
         // First Try Local Scope
         if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
+            System.out.println(value);
             this.getLocal().setVariable(name, value);
         }
         // Otherwise global
@@ -56,6 +58,7 @@ public class ComplexScope extends Scope {
         
         // First Try Local Scope
         if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
+            System.out.println(this.getLocal().getVariable(name));
             return this.getLocal().getVariable(name);
         }
         // Otherwise global

@@ -12,9 +12,10 @@ import somelanguage.Value.Value;
 public class Scope {
 
     protected ArrayList<Variable> variables = new ArrayList<Variable>();
+    private final String name;
     
-    public Scope(){
-        
+    public Scope(String name){
+        this.name = name;
     }
 
     public void addVariable(String name) {
@@ -27,15 +28,18 @@ public class Scope {
 
         int index = findVariable(name);
         if(index == -1){
-            this.variables.add(new Variable(name, value));
+            addVariable(new Variable(name, value));
         }
         else{
             System.out.println("Warning: Redeclaring Local Variable "+ name);
             
-            Variable object = this.variables.get(index);
-            object.setValue(value);
+            setVariable(name, value);
         }
         
+    }
+
+    public void addVariable(Variable var) {
+        this.variables.add(var);
     }
 
     public void setVariable(String name, Value value){
@@ -65,7 +69,7 @@ public class Scope {
 
     }
 
-    private int findVariable(String name){
+    protected int findVariable(String name){
 
         for(int i = 0; i < this.variables.size(); i++){
             if(this.variables.get(i).getName().equals(name)){
@@ -79,16 +83,16 @@ public class Scope {
 
     public Value getVariable(String name){
 
-        Variable object = getVariableObject(name);
-        if(object == null){
+        int index = findVariable(name);
+        if(index == -1){
             return new UndefinedValue();
         }else{
-            return object.getValue();
+            return this.variables.get(index).getValue();
         }
 
     }
 
-    private Variable getVariableObject(String name){
+    protected Variable getVariableObject(String name){
 
         int index = findVariable(name);
         if(index == -1){
@@ -102,7 +106,7 @@ public class Scope {
     public String toString(){
 
         String output = variables.toString();
-        return output;
+        return name + output;
 
     }
 

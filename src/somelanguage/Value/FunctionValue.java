@@ -22,4 +22,8 @@ public abstract class FunctionValue extends Value{
         return new Token(TokenType.FUNCTION);
     }
 
+    public String getName() {
+        return "func" + hashCode();
+    }
+
 }

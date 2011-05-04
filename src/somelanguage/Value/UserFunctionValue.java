@@ -12,15 +12,17 @@ import somelanguage.Parser.TokenType;
  */
 public class UserFunctionValue extends FunctionValue{
     private final ArrayList<Token> tokens;
+    private final ComplexScope scope;
 
-    public UserFunctionValue(ArrayList<Token> value){
+    public UserFunctionValue(ArrayList<Token> value, ComplexScope scope){
         this.tokens = value;
+        this.scope = scope;
     }
 
     public Value call(ArrayList<Value> arguments) throws Exception{
 
-        ComplexScope scope = Main.scope;
-        scope.local.addStack();
+        ComplexScope scope = this.scope;
+        scope.local.addStack("User Function");
 
         int i = 0;
         for(Value value:arguments){
@@ -29,7 +31,7 @@ public class UserFunctionValue extends FunctionValue{
         }
         
         Value value = Main.runner.run(tokens, scope);
-        scope.local.removeStack();
+        scope.local.removeStack("User Function");
 
         return value;
     }
@@ -41,7 +43,7 @@ public class UserFunctionValue extends FunctionValue{
 
     @Override
     public Token toToken() {
-        return new Token(TokenType.FUNCTION);
+        return new Token(TokenType.STRING, getName());
     }
 
 }

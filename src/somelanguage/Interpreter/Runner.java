@@ -21,10 +21,6 @@ public class Runner {
         // Add a end statement to whatever we are working with
         tokens.add(new Token(TokenType.END_STATEMENT));
 
-        // Compile
-        Compiler compiler = new Compiler();
-        compiler.run(tokens, scope);
-
         // Create a scanner
         Scanner scanner = new Scanner(tokens);
 
@@ -60,9 +56,9 @@ public class Runner {
                 || token.getTokenType() == TokenType.OPENBRACES){
 
             if(token.getTokenType() == TokenType.CLOSEBRACES)
-                fullScope.local.removeStack();
+                fullScope.local.removeStack("Anonymous Scope");
             else
-                fullScope.local.addStack();
+                fullScope.local.addStack("Anonymous Scope");
 
             // Scan past the bracket
             statement.next();

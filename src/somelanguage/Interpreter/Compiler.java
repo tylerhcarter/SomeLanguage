@@ -31,7 +31,7 @@ public class Compiler {
                     
                     ArrayList<Token> statement = slice(tokens, i, closeBrace);
                     
-                    scope.local.addVariable(name, new UserFunctionValue(statement));
+                    scope.local.addVariable(name, new UserFunctionValue(statement, scope));
 
             }
 

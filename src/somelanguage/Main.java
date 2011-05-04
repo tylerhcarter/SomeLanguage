@@ -32,20 +32,22 @@ public class Main {
         Main.runner = new Runner();
         
         try {
-            String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
+            String text = readFile("H:/cha_java/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
 
-            Scope globalScope = new Scope();
+            Scope globalScope = new Scope("global");
             globalScope.addVariable("echo", new Echo());
-            StackBasedScope localScope = new StackBasedScope();
-            localScope.addStack();
+
+            StackBasedScope localScope = new StackBasedScope("top");
+            localScope.addStack("main");
 
             // Combines the two scopes
-            Main.scope = new ComplexScope(globalScope, localScope);
+            Main.scope = new ComplexScope("main", globalScope, localScope);
             
             Value value = Main.runner.run(tokens, Main.scope);
             System.out.println("Final Value: " + value);
+            
         } catch (Exception ex) {
             throw ex;
         }
