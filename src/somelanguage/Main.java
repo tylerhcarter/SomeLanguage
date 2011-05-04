@@ -10,6 +10,7 @@ import somelanguage.Parser.Token;
 import somelanguage.Parser.Parser;
 import somelanguage.Parser.LexicalParser;
 import java.util.ArrayList;
+import somelanguage.Functions.Echo;
 import somelanguage.Interpreter.Runner;
 import somelanguage.Value.Value;
 
@@ -36,6 +37,7 @@ public class Main {
             ArrayList<Token> tokens = parser.parse(text);
 
             Scope globalScope = new Scope();
+            globalScope.addVariable("echo", new Echo());
             StackBasedScope localScope = new StackBasedScope();
             localScope.addStack();
 

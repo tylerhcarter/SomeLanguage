@@ -2,6 +2,7 @@ package somelanguage.Functions;
 
 import java.util.ArrayList;
 import somelanguage.Value.DefinedFunctionValue;
+import somelanguage.Value.NullValue;
 import somelanguage.Value.Value;
 
 /**
@@ -12,7 +13,12 @@ public class Echo extends DefinedFunctionValue{
 
     @Override
     public Value call(ArrayList<Value> arguments) throws Exception {
-        throw new Exception("Not Implemented");
+
+        for(Value value:arguments){
+            System.out.println("Printing: " + value);
+        }
+
+        return new NullValue();
     }
 
 }
