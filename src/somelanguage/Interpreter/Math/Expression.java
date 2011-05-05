@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package somelanguage.Interpreter;
+package somelanguage.Interpreter.Math;
 
 import somelanguage.Value.Value;
 
