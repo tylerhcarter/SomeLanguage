@@ -1,14 +1,17 @@
 package somelanguage;
 
+import somelanguage.Interpreter.Function;
+import somelanguage.Variables.Scope;
+import somelanguage.Variables.ComplexScope;
+import somelanguage.Variables.StackBasedScope;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import somelanguage.Parser.Token;
+import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Parser;
-import somelanguage.Parser.LexicalParser;
 import java.util.ArrayList;
 import somelanguage.Functions.Echo;
 import somelanguage.Interpreter.Runner;
@@ -28,11 +31,11 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
 
-        Parser parser = new LexicalParser();
+        Parser parser = new Parser();
         Main.runner = new Runner();
         
         try {
-            String text = readFile("H:/cha_java/SomeLanguage/src/somelanguage/file.txt");
+            String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
 
@@ -44,8 +47,10 @@ public class Main {
 
             // Combines the two scopes
             Main.scope = new ComplexScope("main", globalScope, localScope);
+
+            Function main = new Function(Main.runner, tokens, Main.scope);
+            Value value = main.run(new ArrayList<Value>(), Main.scope);
             
-            Value value = Main.runner.run(tokens, Main.scope);
             System.out.println("Final Value: " + value);
             
         } catch (Exception ex) {

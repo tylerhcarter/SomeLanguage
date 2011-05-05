@@ -1,7 +1,7 @@
 package somelanguage.Value;
 
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *
@@ -28,12 +28,12 @@ public class IntegerValue extends Value{
     }
 
     public String toString(){
-        return this.value + "";
+        return "(integer)" + this.value + "";
     }
 
     @Override
     public Token toToken() {
-        return new Token(TokenType.INTEGER, this.value + "");
+        return new Token(TokenType.INTEGER, this);
     }
 
 }

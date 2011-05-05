@@ -1,5 +1,31 @@
-var subtract = function {
-    return argument1 - 50;
+var someFunction = function {
+    echo ( 98 );
 };
 
-return subtract ( 61 );
+someFunction ( );
+
+var Math = function {
+    var amount = argument1;
+
+    var add = function {
+        return argument1 + amount;
+    };
+
+    var subtract = function {
+        return argument1 - amount;
+    };
+
+    var multiply = function {
+        return argument1 * amount;
+    };
+
+    var divide = function {
+        return argument1 / amount;
+    };
+
+    return divide;
+
+};
+
+var t = Math ( 10 );
+return t ( 20 );

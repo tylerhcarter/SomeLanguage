@@ -1,7 +1,7 @@
 package somelanguage.Value;
 
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *

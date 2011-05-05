@@ -1,7 +1,7 @@
 package somelanguage.Value;
 
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *
@@ -29,7 +29,7 @@ public class StringValue extends Value{
 
     @Override
     public Token toToken() {
-        return new Token(TokenType.STRING, this.value);
+        return new Token(TokenType.STRING, this);
     }
 
 }

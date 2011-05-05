@@ -1,6 +1,7 @@
 package somelanguage.Value;
 
 import java.util.ArrayList;
+import somelanguage.Variables.ComplexScope;
 
 /**
  *
@@ -8,6 +9,6 @@ import java.util.ArrayList;
  */
 public abstract class DefinedFunctionValue extends FunctionValue{
 
-    public abstract Value call(ArrayList<Value> arguments) throws Exception;
+    public abstract Value call(ArrayList<Value> arguments, ComplexScope scope) throws Exception;
 
 }

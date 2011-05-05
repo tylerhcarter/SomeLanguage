@@ -1,10 +1,9 @@
 package somelanguage.Interpreter;
 
 import java.util.ArrayList;
-import somelanguage.ComplexScope;
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
-import somelanguage.Scanner;
+import somelanguage.Variables.ComplexScope;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.ReturnValue;
 import somelanguage.Value.Value;
@@ -70,7 +69,7 @@ public class Runner {
         if(token.getTokenType() == TokenType.LOCAL_DECLARE){
 
             // Add variable to scope
-            String name = statement.next(2).getTokenValue();
+            String name = statement.next(2).getTokenValue().toString();
             declareVariable(name, fullScope, true);
 
             // Trim statement
@@ -83,7 +82,7 @@ public class Runner {
         if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
 
             // Add variable to scope
-            String name = statement.next(2).getTokenValue();
+            String name = statement.next(2).getTokenValue().toString();
             declareVariable(name, fullScope, false);
 
             // Trim statement
@@ -140,7 +139,7 @@ public class Runner {
         // Get next tokens
         Scanner operation = scanner.getTokenToEndStatement();
 
-        Math math = new Math();
+        ExpressionEngine math = new ExpressionEngine();
 
         return math.evaluate(operation.getTokens(), scope);
     }
