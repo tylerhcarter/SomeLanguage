@@ -1,17 +1,20 @@
 package somelanguage.Interpreter;
 
 import java.util.ArrayList;
+import somelanguage.Interpreter.Math.Add;
+import somelanguage.Interpreter.Math.Divide;
+import somelanguage.Interpreter.Math.MathOperation;
+import somelanguage.Interpreter.Math.Multiply;
+import somelanguage.Interpreter.Math.Subtract;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.BooleanValue;
 import somelanguage.Value.FunctionValue;
-import somelanguage.Value.IntegerValue;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.UserFunctionValue;
 import somelanguage.Value.Value;
 import somelanguage.Value.StringValue;
-import somelanguage.Value.ValueType;
 
 /**
  *
@@ -19,13 +22,37 @@ import somelanguage.Value.ValueType;
  */
 public class ExpressionEngine {
 
+    private ArrayList<MathOperation> operations = new ArrayList<MathOperation>();
+
+    public ExpressionEngine(){
+
+        // Add Math Operations
+        this.operations.add(new Add(this));
+        this.operations.add(new Subtract(this));
+        this.operations.add(new Multiply(this));
+        this.operations.add(new Divide(this));
+    }
+
+    /*
+     * Evaluates a single token to a value
+     */
+    public Value evaluate(Token token, ComplexScope scope) throws Exception{
+        ArrayList<Token> tokens = new ArrayList<Token>();
+        tokens.add(token);
+        
+        return getToken(tokens, 0, scope);
+    }
+
+    /*
+     * Evaluates a series of tokens to a single value
+     */
     public Value evaluate(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         if(tokens.isEmpty())
             return new NullValue();
 
         // Turn functions into values
-        doFunctionCompile(tokens, scope);
+        compileFunctions(tokens, scope);
         
         // Preform function calls
         doFunctionCalls(tokens, scope);
@@ -33,16 +60,11 @@ public class ExpressionEngine {
         // Math
         doBrackets(tokens, scope);
         
-        doDivision(tokens, scope);
-        
-        doMultiplication(tokens, scope);
-        
-        doSubtraction(tokens, scope);
-        
-        doAddition(tokens, scope);
+        for(MathOperation op:this.operations){
+            op.doOperation(tokens, scope);
+        }
 
         doAssignment(tokens, scope);
-        
 
         if(tokens.size() > 1){
             throw new Exception("Badly Formed Expression.");
@@ -51,7 +73,25 @@ public class ExpressionEngine {
         return getToken(tokens, 0, scope);
     }
 
-    public void doFunctionCalls(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+     /*
+     * Returns token's value
+     */
+    private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
+        Token token = tokens.get(i);
+
+        if(token.getTokenType() == TokenType.STRING){
+            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString());
+            return value;
+
+        }else{
+            return token.getTokenValue();
+        }
+    }
+
+    /*
+     * Searches for function calls and executes them
+     */
+    private void doFunctionCalls(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         if(tokens.isEmpty())
             return;
@@ -67,29 +107,27 @@ public class ExpressionEngine {
             else if(token.getTokenType() == TokenType.STRING
                     && tokens.get(i + 1).getTokenType() == TokenType.OPENBRACKET){
 
+                // Get Variable Name
                 String name = token.getTokenValue().toString();
+
+                // Get Variable Value
                 Value v = scope.getVariable(name);
 
+                // Convert Variable Value to FunctionValue
+                FunctionValue value;
                 try{
-
-                    FunctionValue value = (FunctionValue) v;
-
+                    value = (FunctionValue) v;
                 }catch(ClassCastException ex){
-
                     System.out.println(ex);
                     throw new Exception("Attempted to call a non-function.");
-                    
                 }
 
-                FunctionValue value = (FunctionValue) v;
-
-                // Find Close Brace
+                // Get Arguments
                 int closeBracket = getCloseBracket(tokens, i + 1);
                 if(closeBracket == -1){
                     throw new Exception("Unmatched Open Bracket.");
                 }
 
-                // Get Arguments
                 ArrayList<Token> statement = slice(tokens, i + 1, closeBracket);
                 tokens.remove(i);
 
@@ -125,7 +163,10 @@ public class ExpressionEngine {
 
     }
 
-    public void doBrackets(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    /*
+     * Searches for bracketed expressions and evaluates them
+     */
+    private void doBrackets(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         if(tokens.isEmpty())
             return;
@@ -133,7 +174,7 @@ public class ExpressionEngine {
         for(int i = 0; i < tokens.size(); i++){
 
             Token token = tokens.get(i);
-            
+
             if(token.getTokenType() == TokenType.CLOSEBRACKET){
                 throw new Exception("Unmatched Close Bracket.");
             }
@@ -156,7 +197,10 @@ public class ExpressionEngine {
         return;
     }
 
-    public void doAssignment(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    /*
+     * Searchs for assignments and preforms them
+     */
+    private void doAssignment(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Loop through each token
         for(int i = 1; i < tokens.size(); i++){
@@ -181,7 +225,7 @@ public class ExpressionEngine {
 
                 // Divide and replace with new token
                 scope.setVariable(name, value);
-                
+
                 slice(tokens, i-1, i+1);
                 tokens.add(i - 1, new Token(TokenType.BOOLEAN, new BooleanValue("true")));
 
@@ -193,174 +237,11 @@ public class ExpressionEngine {
 
     }
 
-    public void doAddition(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
-
-        // Loop through each token
-        for(int i = 1; i < tokens.size(); i++){
-
-            Token token = tokens.get(i);
-
-            // Check if this is a divider
-            if(token.getTokenType() == TokenType.ADD){
-
-                // Check Left
-                if((i - 1) < 0){
-                    throw new Exception ("Expected INTEGER, found ADD");
-                }
-                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
-
-                // Check Right
-                if((i + 1) >= tokens.size()){
-                    throw new Exception ("Expected INTEGER, found END_STATEMENT");
-                }
-                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
-
-                // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator + divisor)));
-
-                slice(tokens, i-1, i+1);
-                tokens.add(i - 1, newToken);
-
-                i = 0;
-
-            }
-
-        }
-        
-    }
-
-    public void doSubtraction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
-
-        // Loop through each token
-        for(int i = 1; i < tokens.size(); i++){
-
-            Token token = tokens.get(i);
-
-            // Check if this is a divider
-            if(token.getTokenType() == TokenType.SUBTRACT){
-
-                // Check Left
-                if((i - 1) < 0){
-                    throw new Exception ("Expected INTEGER, found SUBTRACT");
-                }
-                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
-
-                // Check Right
-                if((i + 1) >= tokens.size()){
-                    throw new Exception ("Expected INTEGER, found END_STATEMENT");
-                }
-                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
-
-                // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator - divisor)));
-
-                slice(tokens, i-1, i+1);
-                tokens.add(i - 1, newToken);
-
-                i = 0;
-
-            }
-
-        }
-
-    }
-
-    public void doMultiplication(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
-
-        // Loop through each token
-        for(int i = 1; i < tokens.size(); i++){
-
-            Token token = tokens.get(i);
-
-            // Check if this is a divider
-            if(token.getTokenType() == TokenType.MULTIPLY){
-
-                // Check Left
-                if((i - 1) < 0){
-                    throw new Exception ("Expected INTEGER, found MULTIPLY");
-                }
-                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
-
-                // Check Right
-                if((i + 1) >= tokens.size()){
-                    throw new Exception ("Expected INTEGER, found END_STATEMENT");
-                }
-                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
-
-                // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator * divisor)));
-
-                slice(tokens, i-1, i+1);
-                tokens.add(i - 1, newToken);
-
-                i = 0;
-
-            }
-
-        }
-
-
-    }
-
-    public void doDivision(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
-
-        // Loop through each token
-        for(int i = 1; i < tokens.size(); i++){
-
-            Token token = tokens.get(i);
-
-            // Check if this is a divider
-            if(token.getTokenType() == TokenType.DIVIDE){
-
-                // Check Left
-                if((i - 1) < 0){
-                    throw new Exception ("Expected INTEGER, found DIVIDE");
-                }
-                int numerator = ((IntegerValue)getToken(tokens, i-1, scope)).getValue();
-
-                // Check Right
-                if((i + 1) >= tokens.size()){
-                    throw new Exception ("Expected INTEGER, found END_STATEMENT");
-                }
-                int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
-
-                // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator / divisor)));
-
-                slice(tokens, i-1, i+1);
-                tokens.add(i - 1, newToken);
-
-                i = 0;
-
-            }
-
-        }
-
-    }
-    
-
-    /*
-     * Removes elements between start and end from token array and returns them
+     /*
+     * Converts function declarations into function references
      */
-    private ArrayList<Token> slice(ArrayList<Token> tokens, int start, int end){
+    private void compileFunctions(ArrayList<Token> tokens, ComplexScope scope) throws Exception {
 
-        ArrayList<Token> result = new ArrayList<Token>();
-
-        for(int i = start; i < end - 1; i++){
-            Token token = tokens.remove(start + 1);
-            result.add(token);
-        }
-
-        // Get rid of old brackets
-        tokens.remove(start);
-        tokens.remove(start);
-
-        return result;
-
-    }
-
-    private void doFunctionCompile(ArrayList<Token> tokens, ComplexScope scope) throws Exception {
-        
         for(int i = 0; i < tokens.size(); i++){
             Token token = tokens.get(i);
 
@@ -378,7 +259,10 @@ public class ExpressionEngine {
 
     }
 
-    public Value getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    /*
+     * Removes tokens inside of a function delcaration and returns them
+     */
+    private Value getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         for(int i = 0; i < tokens.size(); i++){
 
@@ -405,6 +289,29 @@ public class ExpressionEngine {
         return new NullValue();
     }
 
+    /*
+     * Removes elements between start and end from token array and returns them
+     */
+    private ArrayList<Token> slice(ArrayList<Token> tokens, int start, int end){
+
+        ArrayList<Token> result = new ArrayList<Token>();
+
+        for(int i = start; i < end - 1; i++){
+            Token token = tokens.remove(start + 1);
+            result.add(token);
+        }
+
+        // Get rid of old brackets
+        tokens.remove(start);
+        tokens.remove(start);
+
+        return result;
+
+    }
+
+    /*
+     * Returns the closest close bracket
+     */
     private int getCloseBracket(ArrayList<Token> tokens, int openBracket) {
 
         int scopeLevel = 1;
@@ -426,6 +333,9 @@ public class ExpressionEngine {
 
     }
 
+    /*
+     * Returns closest close brace
+     */
     private int getCloseBrace(ArrayList<Token> tokens, int openBracket) {
 
         int scopeLevel = 1;
@@ -445,18 +355,6 @@ public class ExpressionEngine {
 
         return -1;
      }
-
-    private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
-        Token token = tokens.get(i);
-
-        if(token.getTokenType() == TokenType.STRING){
-            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString());            
-            return value;
-
-        }else{
-            return token.getTokenValue();
-        }
-    }
 
 }
 
