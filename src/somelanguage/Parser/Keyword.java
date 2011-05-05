@@ -1,5 +1,7 @@
 package somelanguage.Parser;
 
+import somelanguage.Parser.Token.TokenType;
+
 /**
  *
  * @author tylercarter

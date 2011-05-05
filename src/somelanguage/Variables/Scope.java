@@ -1,5 +1,6 @@
-package somelanguage;
+package somelanguage.Variables;
 
+import somelanguage.Variables.Variable;
 import java.util.ArrayList;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.UndefinedValue;

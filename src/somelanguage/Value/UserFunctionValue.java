@@ -1,39 +1,35 @@
 package somelanguage.Value;
 
+import somelanguage.Variables.Variable;
 import java.util.ArrayList;
-import somelanguage.ComplexScope;
+import somelanguage.Variables.ComplexScope;
+import somelanguage.Interpreter.Function;
 import somelanguage.Main;
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
+import somelanguage.Variables.Scope;
+import somelanguage.Variables.StackBasedScope;
 
 /**
  *
  * @author tylercarter
  */
 public class UserFunctionValue extends FunctionValue{
-    private final ArrayList<Token> tokens;
-    private final ComplexScope scope;
+    private final Function script;
 
-    public UserFunctionValue(ArrayList<Token> value, ComplexScope scope){
-        this.tokens = value;
-        this.scope = scope;
+    public UserFunctionValue(ArrayList<Token> tokens, ComplexScope scope){
+
+        // Create function to run later
+        this.script = new Function(Main.runner, tokens, scope);
+        
     }
 
-    public Value call(ArrayList<Value> arguments) throws Exception{
+    public Value call(ArrayList<Value> arguments, ComplexScope parentScope) throws Exception{
 
-        ComplexScope scope = this.scope;
-        scope.local.addStack("User Function");
-
-        int i = 0;
-        for(Value value:arguments){
-            i++;
-            scope.local.addVariable("argument" + i, value);
-        }
-        
-        Value value = Main.runner.run(tokens, scope);
-        scope.local.removeStack("User Function");
-
+        // Run function and return value
+        Value value = script.run(arguments, parentScope);
         return value;
+        
     }
 
     @Override
@@ -43,7 +39,7 @@ public class UserFunctionValue extends FunctionValue{
 
     @Override
     public Token toToken() {
-        return new Token(TokenType.STRING, getName());
+        return new Token(TokenType.USERFUNC, this);
     }
 
 }

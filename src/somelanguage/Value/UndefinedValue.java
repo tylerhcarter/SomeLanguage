@@ -5,7 +5,7 @@
 
 package somelanguage.Value;
 
-import somelanguage.Parser.Token;
+import somelanguage.Parser.Token.Token;
 
 /**
  *

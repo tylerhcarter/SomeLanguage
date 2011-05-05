@@ -1,9 +1,9 @@
 
-package somelanguage;
+package somelanguage.Interpreter;
 
 import java.util.ArrayList;
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *

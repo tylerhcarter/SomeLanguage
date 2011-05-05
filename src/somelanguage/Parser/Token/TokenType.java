@@ -1,4 +1,4 @@
-package somelanguage.Parser;
+package somelanguage.Parser.Token;
 
 /**
  *
@@ -9,6 +9,7 @@ public enum TokenType {
     // BASIC VARIABLES
     LOCAL_DECLARE,
     GLOBAL_DECLARE,
+    FUNCTION_DECLARE,
     ASSIGNMENT,
 
     ADD,
@@ -34,7 +35,6 @@ public enum TokenType {
 
     NULL,
     BOOLEAN,
-
-    FUNCTION,
-    RETURN
+    RETURN,   
+    USERFUNC
 };

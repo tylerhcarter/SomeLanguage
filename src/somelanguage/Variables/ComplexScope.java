@@ -1,5 +1,7 @@
-package somelanguage;
+package somelanguage.Variables;
 
+import somelanguage.Variables.StackBasedScope;
+import somelanguage.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import somelanguage.Value.Value;
@@ -29,7 +31,6 @@ public class ComplexScope extends Scope {
 
         // First Try Local Scope
         if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
-            System.out.println(value);
             this.getLocal().setVariable(name, value);
         }
         // Otherwise global
@@ -58,7 +59,6 @@ public class ComplexScope extends Scope {
         
         // First Try Local Scope
         if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
-            System.out.println(this.getLocal().getVariable(name));
             return this.getLocal().getVariable(name);
         }
         // Otherwise global

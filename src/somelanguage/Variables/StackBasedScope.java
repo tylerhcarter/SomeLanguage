@@ -1,5 +1,6 @@
-package somelanguage;
+package somelanguage.Variables;
 
+import somelanguage.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,20 +24,36 @@ public class StackBasedScope extends Scope{
     /*
      * Delves into a new stack
      */
-    public void addStack(String name){
-        System.out.println("----- Add Stack (" + name + ")");
+    public void addStack(){
         this.scopeStack.push(this.variables);
         this.variables = new ArrayList<Variable>();
+    }
 
+    public void addStack(String name){
+        this.scopeStack.push(this.variables);
+        this.variables = new ArrayList<Variable>();
+    }
+
+    /*
+     * Delves into a new stack
+     */
+    public void addStack(ArrayList<Variable> scope){
+        this.scopeStack.push(this.variables);
+        this.variables = scope;
+    }
+
+    /*
+     *  Returns one level up
+     */
+    public void removeStack(){
+        this.variables = this.scopeStack.pop();
     }
 
     /*
      *  Returns one level up
      */
     public void removeStack(String name){
-        System.out.println("----- Remove Stack (" + name + ")");
         this.variables = this.scopeStack.pop();
-
     }
 
     @Override
@@ -48,8 +65,6 @@ public class StackBasedScope extends Scope{
         }
         
         stack.add(variables);
-
-        System.out.println(stack);
 
         // Go up the scope stack
         for(int x = stack.size() - 1; x >= 0 ; x--){
@@ -87,6 +102,17 @@ public class StackBasedScope extends Scope{
         Variable var = new Variable(name);
         this.addVariable(var);
         return var;
+
+    }
+
+    @Override
+    public String toString(){
+
+        String output = variables.toString();
+        for(int i = 0; i < this.scopeStack.size(); i++){
+            output += this.scopeStack.get(i).toString();
+        }
+        return output;
 
     }
 

@@ -1,8 +1,9 @@
 package somelanguage.Value;
 
 import java.util.ArrayList;
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
+import somelanguage.Variables.ComplexScope;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *
@@ -10,7 +11,7 @@ import somelanguage.Parser.TokenType;
  */
 public abstract class FunctionValue extends Value{
 
-    public abstract Value call(ArrayList<Value> arguments) throws Exception;
+    public abstract Value call(ArrayList<Value> arguments, ComplexScope scope) throws Exception;
 
     @Override
     public ValueType getType() {
@@ -19,7 +20,7 @@ public abstract class FunctionValue extends Value{
 
     @Override
     public Token toToken() {
-        return new Token(TokenType.FUNCTION);
+        return new Token(TokenType.USERFUNC, this);
     }
 
     public String getName() {

@@ -1,4 +1,4 @@
-package somelanguage;
+package somelanguage.Variables;
 import somelanguage.Value.IntegerValue;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.Value;
@@ -8,7 +8,7 @@ import somelanguage.Value.StringValue;
  *
  * @author tylercarter
  */
-class Variable {
+public class Variable {
     private String name;
     private Value value;
 

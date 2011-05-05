@@ -1,41 +1,48 @@
 package somelanguage.Interpreter;
 
 import java.util.ArrayList;
-import somelanguage.ComplexScope;
-import somelanguage.Parser.Token;
-import somelanguage.Parser.TokenType;
-import somelanguage.Scope;
+import somelanguage.Variables.ComplexScope;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.BooleanValue;
 import somelanguage.Value.FunctionValue;
 import somelanguage.Value.IntegerValue;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.UserFunctionValue;
 import somelanguage.Value.Value;
+import somelanguage.Value.StringValue;
 import somelanguage.Value.ValueType;
 
 /**
  *
  * @author tylercarter
  */
-public class Math {
+public class ExpressionEngine {
 
     public Value evaluate(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         if(tokens.isEmpty())
             return new NullValue();
 
+        // Turn functions into values
         doFunctionCompile(tokens, scope);
-
+        
+        // Preform function calls
         doFunctionCalls(tokens, scope);
-
+        
+        // Math
         doBrackets(tokens, scope);
-
+        
         doDivision(tokens, scope);
+        
         doMultiplication(tokens, scope);
+        
         doSubtraction(tokens, scope);
+        
         doAddition(tokens, scope);
 
         doAssignment(tokens, scope);
+        
 
         if(tokens.size() > 1){
             throw new Exception("Badly Formed Expression.");
@@ -52,7 +59,7 @@ public class Math {
         for(int i = 0; i < tokens.size() - 1; i++){
 
             Token token = tokens.get(i);
-            
+
             if(token.getTokenType() == TokenType.CLOSEBRACKET){
                 throw new Exception("Unmatched Close Bracket.");
             }
@@ -60,12 +67,20 @@ public class Math {
             else if(token.getTokenType() == TokenType.STRING
                     && tokens.get(i + 1).getTokenType() == TokenType.OPENBRACKET){
 
-                String name = token.getTokenValue();
+                String name = token.getTokenValue().toString();
                 Value v = scope.getVariable(name);
 
-                if(v.getType() != ValueType.FUNCTION)
+                try{
+
+                    FunctionValue value = (FunctionValue) v;
+
+                }catch(ClassCastException ex){
+
+                    System.out.println(ex);
                     throw new Exception("Attempted to call a non-function.");
-                
+                    
+                }
+
                 FunctionValue value = (FunctionValue) v;
 
                 // Find Close Brace
@@ -95,11 +110,12 @@ public class Math {
 
                 ArrayList<Value> argumentValues = new ArrayList<Value>();
                 for(int x = 0; x < arguments.size(); x++){
-                    argumentValues.add(evaluate(arguments.get(x), scope));
+                    Value t = evaluate(arguments.get(x), scope);
+                    argumentValues.add(t);
                 }
 
                 // Call it
-                Value returnValue = value.call(argumentValues);
+                Value returnValue = value.call(argumentValues, scope);
 
                 // Insert Return Value
                 tokens.add(i, returnValue.toToken());
@@ -132,7 +148,7 @@ public class Math {
                 ArrayList<Token> subExpression = slice(tokens, i, closeBracket);
 
                 // Evaluate the expression and insert it in place of the expression
-                tokens.add(i, new Token(TokenType.INTEGER, evaluate(subExpression, scope) + ""));
+                tokens.add(i, new Token(TokenType.INTEGER, evaluate(subExpression, scope)));
             }
 
         }
@@ -154,7 +170,7 @@ public class Math {
                 if((i - 1) < 0){
                     throw new Exception ("Expected STRING, found ADD");
                 }
-                String name = tokens.get(i - 1).getTokenValue();
+                String name = tokens.get(i - 1).getTokenValue().toString();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
@@ -167,7 +183,7 @@ public class Math {
                 scope.setVariable(name, value);
                 
                 slice(tokens, i-1, i+1);
-                tokens.add(i - 1, new Token(TokenType.BOOLEAN, "true"));
+                tokens.add(i - 1, new Token(TokenType.BOOLEAN, new BooleanValue("true")));
 
                 i = 0;
 
@@ -200,7 +216,7 @@ public class Math {
                 int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, (int)(numerator + divisor)+"");
+                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator + divisor)));
 
                 slice(tokens, i-1, i+1);
                 tokens.add(i - 1, newToken);
@@ -236,7 +252,7 @@ public class Math {
                 int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, (int)(numerator - divisor)+"");
+                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator - divisor)));
 
                 slice(tokens, i-1, i+1);
                 tokens.add(i - 1, newToken);
@@ -272,7 +288,7 @@ public class Math {
                 int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, (int)(numerator * divisor)+"");
+                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator * divisor)));
 
                 slice(tokens, i-1, i+1);
                 tokens.add(i - 1, newToken);
@@ -309,7 +325,7 @@ public class Math {
                 int divisor = ((IntegerValue)getToken(tokens, i+1, scope)).getValue();
 
                 // Divide and replace with new token
-                Token newToken = new Token(TokenType.INTEGER, (int)(numerator / divisor)+"");
+                Token newToken = new Token(TokenType.INTEGER, new IntegerValue((int)(numerator / divisor)));
 
                 slice(tokens, i-1, i+1);
                 tokens.add(i - 1, newToken);
@@ -343,55 +359,18 @@ public class Math {
 
     }
 
-    private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
-
-        Token token = tokens.get(i);
-
-        if(token.getTokenType() == TokenType.INTEGER){
-            return new IntegerValue(Integer.parseInt(token.getTokenValue()));
-        }else if(token.getTokenType() == TokenType.STRING) {
-
-            Value value = scope.getVariable(token.getTokenValue());
-            if(value.getType() == ValueType.UNDEFINED){
-                throw new Exception("Undefined variable " + token.getTokenValue());
-            }
-            else{
-                return value;
-            }
-
-        }else if(token.getTokenType() == TokenType.BOOLEAN){
-
-            return new BooleanValue(token.getTokenValue());
-
-        }else if(token.getTokenType() == TokenType.FUNCTION){
-
-            Value v = getFunction(tokens, scope);
-            
-            return v;
-
-        }else if(token.getTokenType() == TokenType.NULL){
-
-            return new NullValue();
-
-        }
-        else{
-            throw new Exception("Unexpected Token " + token.getTokenType());
-        }
-
-    }
-
     private void doFunctionCompile(ArrayList<Token> tokens, ComplexScope scope) throws Exception {
         
         for(int i = 0; i < tokens.size(); i++){
             Token token = tokens.get(i);
 
-            if(token.getTokenType() == TokenType.FUNCTION){
+            if(token.getTokenType() == TokenType.FUNCTION_DECLARE){
 
                 Value value = getFunction(tokens, scope);
                 String name = ((FunctionValue) value).getName();
                 scope.global.addVariable(name, value);
 
-                tokens.add(i, new Token(TokenType.STRING, name));
+                tokens.add(i, new Token(TokenType.USERFUNC, value));
 
                 i = 0;
             }
@@ -466,6 +445,18 @@ public class Math {
 
         return -1;
      }
+
+    private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
+        Token token = tokens.get(i);
+
+        if(token.getTokenType() == TokenType.STRING){
+            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString());            
+            return value;
+
+        }else{
+            return token.getTokenValue();
+        }
+    }
 
 }
 

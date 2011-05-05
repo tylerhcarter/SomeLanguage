@@ -1,6 +1,7 @@
 package somelanguage.Functions;
 
 import java.util.ArrayList;
+import somelanguage.Variables.ComplexScope;
 import somelanguage.Value.DefinedFunctionValue;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.Value;
@@ -12,7 +13,7 @@ import somelanguage.Value.Value;
 public class Echo extends DefinedFunctionValue{
 
     @Override
-    public Value call(ArrayList<Value> arguments) throws Exception {
+    public Value call(ArrayList<Value> arguments, ComplexScope scope) throws Exception {
 
         for(Value value:arguments){
             System.out.println("Printing: " + value);
