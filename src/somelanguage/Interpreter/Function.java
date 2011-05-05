@@ -33,8 +33,6 @@ public class Function {
 
         setArguments(arguments, funcScope);
 
-        System.out.println("Starting Function " + arguments);
-
         // Run Script
         Value value = this.runner.run(this.tokens, funcScope);
 

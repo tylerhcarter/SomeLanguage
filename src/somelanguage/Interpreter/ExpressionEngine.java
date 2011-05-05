@@ -2,9 +2,12 @@ package somelanguage.Interpreter;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Math.Add;
+import somelanguage.Interpreter.Math.And;
 import somelanguage.Interpreter.Math.Divide;
+import somelanguage.Interpreter.Math.Equality;
 import somelanguage.Interpreter.Math.MathOperation;
 import somelanguage.Interpreter.Math.Multiply;
+import somelanguage.Interpreter.Math.Or;
 import somelanguage.Interpreter.Math.Subtract;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
@@ -31,6 +34,10 @@ public class ExpressionEngine {
         this.operations.add(new Subtract(this));
         this.operations.add(new Multiply(this));
         this.operations.add(new Divide(this));
+
+        this.operations.add(new Equality(this));
+        this.operations.add(new And(this));
+        this.operations.add(new Or(this));
     }
 
     /*
@@ -59,7 +66,7 @@ public class ExpressionEngine {
         
         // Math
         doBrackets(tokens, scope);
-        
+
         for(MathOperation op:this.operations){
             op.doOperation(tokens, scope);
         }

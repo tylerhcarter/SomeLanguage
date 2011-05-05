@@ -35,7 +35,7 @@ public class Main {
         Main.runner = new Runner();
         
         try {
-            String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
+            String text = readFile("H:/cha_java/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
 

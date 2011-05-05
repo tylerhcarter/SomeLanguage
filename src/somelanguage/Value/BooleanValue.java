@@ -27,6 +27,11 @@ public class BooleanValue extends Value {
     }
 
     @Override
+    public String toString(){
+        return this.value + "";
+    }
+
+    @Override
     public ValueType getType() {
         return ValueType.BOOLEAN;
     }

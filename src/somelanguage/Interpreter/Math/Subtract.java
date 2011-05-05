@@ -1,6 +1,5 @@
 package somelanguage.Interpreter.Math;
 
-import somelanguage.Interpreter.Expression;
 import somelanguage.Interpreter.ExpressionEngine;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;

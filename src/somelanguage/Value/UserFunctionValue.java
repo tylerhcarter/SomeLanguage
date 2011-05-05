@@ -15,7 +15,7 @@ import somelanguage.Variables.StackBasedScope;
  * @author tylercarter
  */
 public class UserFunctionValue extends FunctionValue{
-    private final Function script;
+    public final Function script;
 
     public UserFunctionValue(ArrayList<Token> tokens, ComplexScope scope){
 

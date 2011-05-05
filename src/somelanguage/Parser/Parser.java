@@ -3,6 +3,7 @@ package somelanguage.Parser;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Parser.Token.Token;
 import java.util.ArrayList;
+import somelanguage.Value.BooleanValue;
 import somelanguage.Value.IntegerValue;
 import somelanguage.Value.StringValue;
 
@@ -23,6 +24,10 @@ public class Parser{
         keywords.add(new Keyword("null", TokenType.NULL));
         keywords.add(new Keyword("=", TokenType.ASSIGNMENT));
         keywords.add(new Keyword(";", TokenType.END_STATEMENT));
+
+        keywords.add(new Keyword("==", TokenType.EQUALITY));
+        keywords.add(new Keyword("&&", TokenType.AND));
+        keywords.add(new Keyword("||", TokenType.OR));
 
         keywords.add(new Keyword("+", TokenType.ADD));
         keywords.add(new Keyword("-", TokenType.SUBTRACT));
@@ -92,6 +97,12 @@ public class Parser{
             // Add Integer Token
             this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
 
+        }
+        else if(string.equals("true")){
+            this.tokens.add(new Token(TokenType.BOOLEAN, new BooleanValue("true")));
+        }
+        else if(string.equals("false")){
+            this.tokens.add(new Token(TokenType.BOOLEAN, new BooleanValue("false")));
         }
         else{
 

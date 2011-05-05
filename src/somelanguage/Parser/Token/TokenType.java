@@ -17,6 +17,8 @@ public enum TokenType {
     DIVIDE,
     MULTIPLY,
 
+    EQUALITY,
+
     OPENBRACKET,
     CLOSEBRACKET,
 
@@ -36,5 +38,8 @@ public enum TokenType {
     NULL,
     BOOLEAN,
     RETURN,   
-    USERFUNC
+    USERFUNC,
+
+    AND,
+    OR
 };
