@@ -49,6 +49,8 @@ public class Processor {
 
     private Value parseLine(TokenScanner statement, ComplexScope fullScope) throws Exception{
 
+        System.out.println(statement.getTokens());
+
         Token token = statement.next(false);
 
         // First Resolve Scope
@@ -115,10 +117,10 @@ public class Processor {
         Token name = tokens.get(1);
 
         if(declare.getTokenType() == TokenType.GLOBAL_DECLARE){
-            declareVariable(name.toString(), scope, false);
+            declareVariable(name.getTokenValue().toString(), scope, false);
         }
         else if(declare.getTokenType() == TokenType.LOCAL_DECLARE){
-            declareVariable(name.toString(), scope, true);
+            declareVariable(name.getTokenValue().toString(), scope, true);
         }
         else{
             throw new Exception("Expecting GLOBAL_DECLARE or LOCAL_DECLARE. Found " + declare.getTokenType());
@@ -133,9 +135,7 @@ public class Processor {
     private void declareVariable(String name, ComplexScope scope, boolean local) throws Exception{
 
         if(local == true){
-            System.out.println("Local Declare");
             scope.getLocal().addVariable(name);
-            System.out.println(scope.getVariables());
         }
         else{
             scope.getGlobal().addVariable(name);

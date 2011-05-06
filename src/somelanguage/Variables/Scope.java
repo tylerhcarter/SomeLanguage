@@ -43,14 +43,12 @@ public class Scope {
         int index = findVariable(name);
         if(index == -1){
             System.out.println("Warning: Using local variable " + name + " without declaration.");
-
             this.variables.add(new Variable(name, value));
         }
         else{
             Variable object = this.variables.get(index);
             object.setValue(value);
         }
-
 
     }
 
