@@ -8,7 +8,7 @@ package somelanguage.Interpreter.Math;
 import somelanguage.Value.Value;
 
 /**
- *
+ * Represents a simple expression with 2 values and an operator
  * @author tylercarter
  */
 public class Expression {

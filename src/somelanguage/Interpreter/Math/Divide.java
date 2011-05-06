@@ -1,6 +1,5 @@
 package somelanguage.Interpreter.Math;
 
-import somelanguage.Interpreter.ExpressionEngine;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.IntegerValue;
@@ -12,7 +11,7 @@ import somelanguage.Variables.ComplexScope;
  */
 public class Divide extends MathOperation {
 
-    public Divide(ExpressionEngine engine){
+    public Divide(ExpressionProcessor engine){
         super(engine);
     }
 

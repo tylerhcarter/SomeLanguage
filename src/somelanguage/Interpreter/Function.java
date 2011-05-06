@@ -4,20 +4,20 @@ import somelanguage.Variables.ComplexScope;
 import somelanguage.Variables.StackBasedScope;
 import somelanguage.Variables.Variable;
 import java.util.ArrayList;
-import somelanguage.Interpreter.Runner;
+import somelanguage.Interpreter.Processor;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Value.Value;
 
 /**
- *
+ * Creates and environment and processes tokens inside of it
  * @author tylercarter
  */
 public class Function {
     private final ArrayList<Token> tokens;
-    private final Runner runner;
+    private final Processor runner;
     private final ArrayList<Variable> localScope;
 
-    public Function (Runner runner, ArrayList<Token> tokens, ComplexScope scope){
+    public Function (Processor runner, ArrayList<Token> tokens, ComplexScope scope){
         
         // Save a copy of the current scope
         this.localScope = scope.local.getVariables();
@@ -28,7 +28,7 @@ public class Function {
 
     public Value run(ArrayList<Value> arguments, ComplexScope parentScope) throws Exception{
 
-        // Set up environemtn
+        // Set up environment
         ComplexScope funcScope = createScope(parentScope);
 
         setArguments(arguments, funcScope);

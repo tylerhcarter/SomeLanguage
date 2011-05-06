@@ -1,14 +1,6 @@
-package somelanguage.Interpreter;
+package somelanguage.Interpreter.Math;
 
 import java.util.ArrayList;
-import somelanguage.Interpreter.Math.Add;
-import somelanguage.Interpreter.Math.And;
-import somelanguage.Interpreter.Math.Divide;
-import somelanguage.Interpreter.Math.Equality;
-import somelanguage.Interpreter.Math.MathOperation;
-import somelanguage.Interpreter.Math.Multiply;
-import somelanguage.Interpreter.Math.Or;
-import somelanguage.Interpreter.Math.Subtract;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
@@ -21,14 +13,14 @@ import somelanguage.Value.Value;
 import somelanguage.Value.StringValue;
 
 /**
- *
+ * Proccesses a list of tokens and evaluates them to a single value
  * @author tylercarter
  */
-public class ExpressionEngine {
+public class ExpressionProcessor {
 
     private ArrayList<MathOperation> operations = new ArrayList<MathOperation>();
 
-    public ExpressionEngine(){
+    public ExpressionProcessor(){
 
         // Add Math Operations
         this.operations.add(new Add(this));
@@ -47,7 +39,7 @@ public class ExpressionEngine {
     public Value evaluate(Token token, ComplexScope scope) throws Exception{
         ArrayList<Token> tokens = new ArrayList<Token>();
         tokens.add(token);
-        
+
         return getToken(tokens, 0, scope);
     }
 
@@ -75,6 +67,7 @@ public class ExpressionEngine {
         doAssignment(tokens, scope);
 
         if(tokens.size() > 1){
+            System.out.println(tokens);
             throw new Exception("Badly Formed Expression.");
         }
 
@@ -109,6 +102,51 @@ public class ExpressionEngine {
 
             if(token.getTokenType() == TokenType.CLOSEBRACKET){
                 throw new Exception("Unmatched Close Bracket.");
+            }
+
+            else if(token.getTokenType() == TokenType.USERFUNC){
+
+                Value v = token.getTokenValue();
+
+                // Convert Variable Value to FunctionValue
+                FunctionValue value;
+                try{
+                    value = (FunctionValue) v;
+                }catch(ClassCastException ex){
+                    System.out.println(ex);
+                    throw new Exception("Attempted to call a non-function.");
+                }
+
+                ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
+                tokens.remove(i);
+
+                ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
+
+                arguments.add(new ArrayList<Token>());
+                int k = 0;
+                for(int o = 0; o < statement.size(); o++){
+
+                    if(statement.get(o).getTokenType() == TokenType.COMMA){
+                        arguments.add(new ArrayList<Token>());
+                        k++;
+                    }else{
+                        arguments.get(k).add(statement.get(o));
+                    }
+
+                }
+
+                ArrayList<Value> argumentValues = new ArrayList<Value>();
+                for(int x = 0; x < arguments.size(); x++){
+                    Value t = evaluate(arguments.get(x), scope);
+                    argumentValues.add(t);
+                }
+
+                // Call it
+                Value returnValue = value.call(argumentValues, scope);
+
+                // Insert Return Value
+                tokens.add(i, returnValue.toToken());
+
             }
 
             else if(token.getTokenType() == TokenType.STRING
@@ -170,7 +208,7 @@ public class ExpressionEngine {
     private void doBrackets(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         if(tokens.isEmpty())
-            return;
+            return; 
 
         for(int i = 0; i < tokens.size(); i++){
 
@@ -268,6 +306,70 @@ public class ExpressionEngine {
      */
     private Value getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
+        // Get Parameters
+        ArrayList<StringValue> parameters = getParameters(tokens);
+
+        // Get function body
+        ArrayList<Token> body = getBody(tokens);
+
+        // Return them as a function
+        return new UserFunctionValue(body, scope);
+        
+    }
+
+    private ArrayList<StringValue> getParameters(ArrayList<Token> tokens) throws Exception {
+
+        for(int i = 0; i < tokens.size(); i++){
+
+            Token token = tokens.get(i);
+
+            // Look for opening brace
+            if(token.getTokenType() == TokenType.OPENBRACKET){
+
+                // Get all braces between
+                ArrayList<Token> parameterTokens = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i);
+
+                // Separate by comma
+                ArrayList<ArrayList<Token>> parameterValues = new ArrayList<ArrayList<Token>>();
+
+                parameterValues.add(new ArrayList<Token>());
+                int k = 0;
+                for(int o = 0; o < parameterTokens.size(); o++){
+
+                    if(parameterTokens.get(o).getTokenType() == TokenType.COMMA){
+                        parameterValues.add(new ArrayList<Token>());
+                        k++;
+                    }else{
+                        parameterValues.get(k).add(parameterTokens.get(o));
+                    }
+
+                }
+
+                ArrayList<StringValue> argumentValues = new ArrayList<StringValue>();
+                for(int x = 0; x < parameterTokens.size(); x++){
+                    if(parameterValues.get(x).size() > 1){
+                        throw new Exception("Badly Fomred Parameter List");
+                    }
+
+                    try{
+                        argumentValues.add((StringValue) parameterValues.get(0).get(0).getTokenValue());
+                    }catch(ClassCastException ex){
+                        throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
+                    }
+                }
+
+                return argumentValues;
+
+            }
+
+        }
+
+        throw new Exception("Did not find parameter list.");
+
+    }
+
+    private ArrayList<Token> getBody(ArrayList<Token> tokens) throws Exception{
+
         for(int i = 0; i < tokens.size(); i++){
 
             Token token = tokens.get(i);
@@ -276,16 +378,14 @@ public class ExpressionEngine {
             if(token.getTokenType() == TokenType.OPENBRACES){
 
                 // Get all braces between
-                ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACES, i);
-
-                // Return them as a function
-                return new UserFunctionValue(statement, scope);
+                return Tokens.sliceBody(tokens, TokenType.OPENBRACES, i);
 
             }
 
         }
 
-        return new NullValue();
+        throw new Exception("Could not find function body.");
+
     }
 
 }

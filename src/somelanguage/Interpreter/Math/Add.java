@@ -1,18 +1,17 @@
 package somelanguage.Interpreter.Math;
 
-import somelanguage.Interpreter.ExpressionEngine;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.IntegerValue;
 import somelanguage.Variables.ComplexScope;
 
 /**
- *
+ * 
  * @author Tyler(Chacha) chacha@chacha102.com
  */
 public class Add extends MathOperation {
 
-    public Add(ExpressionEngine engine){
+    public Add(ExpressionProcessor engine){
         super(engine);
     }
 

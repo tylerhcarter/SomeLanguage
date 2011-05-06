@@ -1,20 +1,19 @@
 package somelanguage.Interpreter.Math;
 
 import java.util.ArrayList;
-import somelanguage.Interpreter.ExpressionEngine;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.Value;
 import somelanguage.Variables.ComplexScope;
 
 /**
- *
+ * Searches for an operator in a list of tokens and preforms actions on them
  * @author Tyler(Chacha) chacha@chacha102.com
  */
 public abstract class MathOperation {
-    protected final ExpressionEngine engine;
+    protected final ExpressionProcessor engine;
 
-    public MathOperation(ExpressionEngine engine){
+    public MathOperation(ExpressionProcessor engine){
         this.engine = engine;
     }
 

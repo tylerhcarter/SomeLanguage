@@ -1,5 +1,6 @@
 package somelanguage.Interpreter;
 
+import somelanguage.Interpreter.Math.ExpressionProcessor;
 import java.util.ArrayList;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
@@ -12,10 +13,10 @@ import somelanguage.Value.Value;
 import somelanguage.Value.ValueType;
 
 /**
- *
+ * Processes a list of tokens and preforms actions based on them
  * @author tylercarter
  */
-public class Runner {
+public class Processor {
 
     public Value run(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
@@ -23,13 +24,13 @@ public class Runner {
         tokens.add(new Token(TokenType.END_STATEMENT));
 
         // Create a scanner
-        Scanner scanner = new Scanner(tokens);
+        TokenScanner scanner = new TokenScanner(tokens);
 
         // Run
         while(scanner.hasNext()){
 
             // Get Line
-            Scanner statement = scanner.getTokenToEndStatement();
+            TokenScanner statement = scanner.getTokenToEndStatement();
 
             // Parse Line
             Value value = parseLine(statement, scope);
@@ -46,7 +47,7 @@ public class Runner {
 
     }
 
-    private Value parseLine(Scanner statement, ComplexScope fullScope) throws Exception{
+    private Value parseLine(TokenScanner statement, ComplexScope fullScope) throws Exception{
 
         Token token = statement.next(false);
 
@@ -143,18 +144,18 @@ public class Runner {
      * Scanner should return a scanner with the next X tokens in it, and advance
      * the current scanner to the end of it
      */
-    private Value evaluateOperation(Scanner scanner, ComplexScope scope) throws Exception {
+    private Value evaluateOperation(TokenScanner scanner, ComplexScope scope) throws Exception {
         return evaluateOperation(scanner.getTokens(), scope);
     }
 
     private Value evaluateOperation(ArrayList<Token> tokens, ComplexScope scope) throws Exception {
 
-        ExpressionEngine math = new ExpressionEngine();
+        ExpressionProcessor math = new ExpressionProcessor();
         return math.evaluate(tokens, scope);
         
     }
 
-    private Value evaluateConditional(Scanner statement, ComplexScope fullScope) throws Exception {
+    private Value evaluateConditional(TokenScanner statement, ComplexScope fullScope) throws Exception {
 
         ArrayList<Token> tokens = statement.getTokens();
 

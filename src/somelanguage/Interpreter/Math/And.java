@@ -1,6 +1,5 @@
 package somelanguage.Interpreter.Math;
 
-import somelanguage.Interpreter.ExpressionEngine;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.BooleanValue;
@@ -13,7 +12,7 @@ import somelanguage.Variables.ComplexScope;
  */
 public class And extends MathOperation {
 
-    public And(ExpressionEngine engine){
+    public And(ExpressionProcessor engine){
         super(engine);
     }
 

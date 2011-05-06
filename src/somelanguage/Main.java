@@ -15,7 +15,7 @@ import somelanguage.Parser.Parser;
 import java.util.ArrayList;
 import somelanguage.Functions.Echo;
 import somelanguage.Functions.Print;
-import somelanguage.Interpreter.Runner;
+import somelanguage.Interpreter.Processor;
 import somelanguage.Value.Value;
 
 /**
@@ -24,7 +24,7 @@ import somelanguage.Value.Value;
  */
 public class Main {
 
-    public static Runner runner;
+    public static Processor runner;
     public static ComplexScope scope;
 
     /**
@@ -33,7 +33,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         Parser parser = new Parser();
-        Main.runner = new Runner();
+        Main.runner = new Processor();
         
         try {
             String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");

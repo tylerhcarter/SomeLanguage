@@ -6,15 +6,15 @@ import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 
 /**
- *
+ * Provides an iterable interface for dealing with arrays of tokens
  * @author tylercarter
  */
-public class Scanner {
+public class TokenScanner {
     
     private ArrayList<Token> tokens;
     private int counter = -1;
     
-    public Scanner(ArrayList<Token> tokens){
+    public TokenScanner(ArrayList<Token> tokens){
         this.tokens = tokens;
     }
 
@@ -57,7 +57,7 @@ public class Scanner {
         return this.tokens;
     }
 
-    public Scanner getTokens(int num){
+    public TokenScanner getTokens(int num){
 
         ArrayList<Token> subset = new ArrayList<Token>();
 
@@ -69,10 +69,10 @@ public class Scanner {
         }
 
         counter = counter + num + 1;
-        return new Scanner(subset);
+        return new TokenScanner(subset);
     }
 
-    public Scanner getTokenToEndStatement(){
+    public TokenScanner getTokenToEndStatement(){
 
         int count = counter + 1;
         int start = counter + 1;
