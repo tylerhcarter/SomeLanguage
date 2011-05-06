@@ -54,6 +54,8 @@ public class Parser{
             addToken(string);
         }
 
+        // Search for Encapsulated strings
+        parseEncapsulatedStrings();
         return this.tokens;
     }
 
@@ -146,6 +148,73 @@ public class Parser{
        {
           return false;
        }
+    }
+
+    private void parseEncapsulatedStrings() {
+
+        for(int i = 0; i < tokens.size(); i++){
+
+            Token token = tokens.get(i);
+
+            // Check for a quote
+            if(token.getTokenType() == TokenType.QUOTE){
+
+                int endQuote = getCloseQuote(this.tokens, i);
+
+                ArrayList<Token> stringTokens = slice(tokens, i, endQuote);
+
+                // Turn Tokens into Strings
+                ArrayList<StringValue> stringValues = new ArrayList<StringValue>();
+
+                for(Token t:stringTokens){
+
+                    stringValues.add((StringValue) t.getTokenValue());
+
+                }
+
+                Token string = new Token(TokenType.ENCAPSULATED_STRING, new EncapsulatedString(stringValues));
+
+                tokens.add(i, string);
+
+                i = 0;
+            }
+
+        }
+    }
+
+    /*
+     * Returns the closest close bracket
+     */
+    private int getCloseQuote(ArrayList<Token> tokens, int openBracket) {
+
+        for(int i = openBracket + 1; i < tokens.size(); i++){
+            if(tokens.get(i).getTokenType() == TokenType.QUOTE){
+                    return i;
+            }
+        }
+
+        return -1;
+
+    }
+
+    /*
+     * Removes elements between start and end from token array and returns them
+     */
+    private ArrayList<Token> slice(ArrayList<Token> tokens, int start, int end){
+
+        ArrayList<Token> result = new ArrayList<Token>();
+
+        for(int i = start; i < end - 1; i++){
+            Token token = tokens.remove(start + 1);
+            result.add(token);
+        }
+
+        // Get rid of old brackets
+        tokens.remove(start);
+        tokens.remove(start);
+
+        return result;
+
     }
 
     

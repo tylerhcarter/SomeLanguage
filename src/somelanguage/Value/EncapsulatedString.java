@@ -1,21 +1,27 @@
 package somelanguage.Value;
 
 import java.util.ArrayList;
+import somelanguage.Parser.Token.Token;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *
  * @author tylercarter
  */
-public class MultiStringValue extends StringValue{
+public class EncapsulatedString extends Value{
 
     protected ArrayList<StringValue> strings = new ArrayList<StringValue>();
 
-    public MultiStringValue(String string){
-        super(string);
+    public EncapsulatedString(String string){
         this.strings.add(new StringValue(string));
     }
 
-    @Override
+    public EncapsulatedString(ArrayList<StringValue> strings){
+        for(StringValue string:strings){
+            this.strings.add(string);
+        }
+    }
+
     public String getValue(){
         return getFull();
     }
@@ -32,7 +38,7 @@ public class MultiStringValue extends StringValue{
         String output = "";
         for(int i = 0; i < this.strings.size(); i++){
 
-            output += this.strings.get(i).getValue();
+            output += this.strings.get(i).getValue() + " ";
 
         }
 
@@ -41,12 +47,17 @@ public class MultiStringValue extends StringValue{
 
     @Override
     public ValueType getType() {
-        return ValueType.STRING;
+        return ValueType.ENCAPSULATED_STRING;
     }
 
     @Override
     public String toString(){
         return getFull();
+    }
+
+    @Override
+    public Token toToken() {
+        return new Token(TokenType.ENCAPSULATED_STRING, this);
     }
 
 }

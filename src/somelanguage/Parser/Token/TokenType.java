@@ -29,6 +29,7 @@ public enum TokenType {
 
     INTEGER,
     STRING,
+    ENCAPSULATED_STRING,
 
     QUOTE,
 
