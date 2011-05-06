@@ -5,6 +5,8 @@ import somelanguage.Parser.Token.Token;
 import java.util.ArrayList;
 import somelanguage.Value.BooleanValue;
 import somelanguage.Value.IntegerValue;
+import somelanguage.Value.EncapsulatedString;
+import somelanguage.Value.NullValue;
 import somelanguage.Value.StringValue;
 
 /**
@@ -21,7 +23,7 @@ public class Parser{
         // Basic Keywords
         keywords.add(new Keyword("global", TokenType.GLOBAL_DECLARE));
         keywords.add(new Keyword("var", TokenType.LOCAL_DECLARE));
-        keywords.add(new Keyword("null", TokenType.NULL));
+        
         keywords.add(new Keyword("=", TokenType.ASSIGNMENT));
         keywords.add(new Keyword(";", TokenType.END_STATEMENT));
 
@@ -45,17 +47,21 @@ public class Parser{
 
         keywords.add(new Keyword("function", TokenType.FUNCTION_DECLARE));
         keywords.add(new Keyword("return", TokenType.RETURN));
+        keywords.add(new Keyword("if", TokenType.IF));
     }
 
     public ArrayList<Token> parse(String text) {
         String[] strings = text.split(" ");
 
+        // Parse the inital set of tokens
         for(String string:strings){
             addToken(string);
         }
 
         // Search for Encapsulated strings
         parseEncapsulatedStrings();
+
+
         return this.tokens;
     }
 
@@ -68,6 +74,7 @@ public class Parser{
             endBuffer.add(new Token(TokenType.END_STATEMENT));
         }
 
+        // Check for beginning or end quotes
         if(string.startsWith("\"")){
             string = string.substring(1);
             this.tokens.add(new Token(TokenType.QUOTE));
@@ -78,39 +85,38 @@ public class Parser{
             endBuffer.add(0, new Token(TokenType.QUOTE));
         }
 
-        // Check that a string still exists
+        // Nothing left? We're done here
         if(string.equals("")){
-
-            // Empty String means we're done here
             this.tokens.addAll(endBuffer);
             return;
         }
 
-        // Check if it is a keyword
+        // Try to convert to a keyword
         if(isKeyword(string)){
-
-            // Add Keyword Token
-            Token token = convertKeyword(string);
-            this.tokens.add(token);
-            
+            this.tokens.add(convertKeyword(string));
         }
+
+        // Check if it is an integer
         else if(isInteger(string)){
-
-            // Add Integer Token
             this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
-
         }
+
+        // Try boolean values
         else if(string.equals("true")){
             this.tokens.add(new Token(TokenType.BOOLEAN, new BooleanValue("true")));
         }
         else if(string.equals("false")){
             this.tokens.add(new Token(TokenType.BOOLEAN, new BooleanValue("false")));
         }
-        else{
 
-            // If not a keyword or integer, is a string
-            this.tokens.add(new Token(TokenType.STRING, new StringValue(string)));
-            
+        // Check for a null
+        else if(string.equals("null")){
+            this.tokens.add(new Token(TokenType.NULL, new NullValue()));
+        }
+
+        // Otherwise it is a string/variable name
+        else{
+            this.tokens.add(new Token(TokenType.STRING, new StringValue(string)));            
         }
         
         // Add end buffer

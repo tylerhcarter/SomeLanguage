@@ -14,6 +14,7 @@ import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Parser;
 import java.util.ArrayList;
 import somelanguage.Functions.Echo;
+import somelanguage.Functions.Print;
 import somelanguage.Interpreter.Runner;
 import somelanguage.Value.Value;
 
@@ -35,18 +36,19 @@ public class Main {
         Main.runner = new Runner();
         
         try {
-            String text = readFile("H:/cha_java/SomeLanguage/src/somelanguage/file.txt");
+            String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
 
-            Scope globalScope = new Scope("global");
+            Scope globalScope = new Scope();
             globalScope.addVariable("echo", new Echo());
+            globalScope.addVariable("print", new Print());
 
-            StackBasedScope localScope = new StackBasedScope("top");
-            localScope.addStack("main");
+            StackBasedScope localScope = new StackBasedScope();
+            localScope.addStack();
 
             // Combines the two scopes
-            Main.scope = new ComplexScope("main", globalScope, localScope);
+            Main.scope = new ComplexScope(globalScope, localScope);
 
             Function main = new Function(Main.runner, tokens, Main.scope);
             Value value = main.run(new ArrayList<Value>(), Main.scope);

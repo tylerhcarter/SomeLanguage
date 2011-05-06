@@ -10,26 +10,26 @@ import somelanguage.Value.StringValue;
  */
 public class Variable {
     private String name;
-    private Value value;
+    private VariableValue value = new VariableValue();
 
     public Variable(String name) {
         this.name = name;
-        this.value = new NullValue();
+        this.value.setValue(new NullValue());
     }
 
     public Variable(String name, int value) {
         this.name = name;
-        this.value = new IntegerValue(value);
+        this.value.setValue(new IntegerValue(value));
     }
 
     public Variable(String name, String value) {
         this.name = name;
-        this.value = new StringValue(value);
+        this.value.setValue(new StringValue(value));
     }
 
     public Variable(String name, Value value) {
         this.name = name;
-        this.value = value;
+        this.value.setValue(value);
     }
 
     /**
@@ -49,7 +49,7 @@ public class Variable {
     /**
      * @return the value
      */
-    public Value getValue() {
+    public VariableValue getValue() {
         return value;
     }
 
@@ -57,14 +57,14 @@ public class Variable {
      * @param value the value to set
      */
     public void setValue(String value) {
-        this.value = new StringValue(value);
+        this.value.setValue(new StringValue(value));
     }
     
     /**
      * @param value the value to set
      */
     public void setValue(Value value) {
-        this.value = value;
+        this.value.setValue(value);
     }
 
 

@@ -63,7 +63,7 @@ public class ExpressionEngine {
         
         // Preform function calls
         doFunctionCalls(tokens, scope);
-        
+
         // Math
         doBrackets(tokens, scope);
 
@@ -85,9 +85,8 @@ public class ExpressionEngine {
      */
     private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
         Token token = tokens.get(i);
-
         if(token.getTokenType() == TokenType.STRING){
-            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString());
+            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString()).getValue();
             return value;
 
         }else{
@@ -118,7 +117,7 @@ public class ExpressionEngine {
                 String name = token.getTokenValue().toString();
 
                 // Get Variable Value
-                Value v = scope.getVariable(name);
+                Value v = scope.getVariable(name).getValue();
 
                 // Convert Variable Value to FunctionValue
                 FunctionValue value;

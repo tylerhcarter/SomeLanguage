@@ -16,7 +16,7 @@ public class Echo extends DefinedFunctionValue{
     public Value call(ArrayList<Value> arguments, ComplexScope scope) throws Exception {
 
         for(Value value:arguments){
-            System.out.println("Printing: " + value);
+            System.out.println(value.toString());
         }
 
         return new NullValue();

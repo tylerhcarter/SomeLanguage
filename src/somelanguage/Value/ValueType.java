@@ -13,6 +13,7 @@ public enum ValueType {
 
     NULL,
     STRING,
+    ENCAPSULATED_STRING,
     INTEGER,
     FUNCTION,
     OBJECT,   

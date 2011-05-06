@@ -1,6 +1,33 @@
+var test = "Mello Hello";
+
+if ( 1 == 1 ) {
+    echo ( "Meh" );
+    echo ( "Test" );
+};
+
+var nedIsCrazy = function {
+    echo ( "Running" );
+    print ( true );
+    return true;
+};
+
+var status = nedIsCrazy ( );
+
+echo ( status );
+
+if ( status ) {
+    echo ( "Test" );
+}
+
+if ( 2 == 1 );
+
+echo ( test );
+
 var someFunction = function {
     echo ( 98 );
 };
+
+echo ( 1 == 1 );
 
 someFunction ( );
 

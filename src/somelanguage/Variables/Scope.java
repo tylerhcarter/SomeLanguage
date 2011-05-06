@@ -13,11 +13,6 @@ import somelanguage.Value.Value;
 public class Scope {
 
     protected ArrayList<Variable> variables = new ArrayList<Variable>();
-    private final String name;
-    
-    public Scope(String name){
-        this.name = name;
-    }
 
     public void addVariable(String name) {
 
@@ -82,11 +77,11 @@ public class Scope {
 
     }
 
-    public Value getVariable(String name){
+    public VariableValue getVariable(String name){
 
         int index = findVariable(name);
         if(index == -1){
-            return new UndefinedValue();
+            return null;
         }else{
             return this.variables.get(index).getValue();
         }
@@ -107,7 +102,7 @@ public class Scope {
     public String toString(){
 
         String output = variables.toString();
-        return name + output;
+        return output;
 
     }
 

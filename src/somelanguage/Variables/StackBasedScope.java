@@ -17,10 +17,6 @@ public class StackBasedScope extends Scope{
 
     protected Stack<ArrayList<Variable>> scopeStack = new Stack();
 
-    public StackBasedScope(String name){
-        super(name);
-    }
-
     /*
      * Delves into a new stack
      */
@@ -57,7 +53,7 @@ public class StackBasedScope extends Scope{
     }
 
     @Override
-    public Value getVariable(String name){
+    public VariableValue getVariable(String name){
 
         ArrayList<ArrayList<Variable>> stack = new ArrayList<ArrayList<Variable>>();
         for(int i = 0; i < this.scopeStack.size(); i++){
@@ -79,7 +75,7 @@ public class StackBasedScope extends Scope{
 
         }
 
-        return new UndefinedValue();
+        return null;
 
     }
 

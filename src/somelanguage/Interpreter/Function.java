@@ -44,8 +44,7 @@ public class Function {
     private ComplexScope createScope(ComplexScope parentScope){
 
         // Make new scope
-        ComplexScope funcScope = new ComplexScope("User Function", parentScope.global,
-                                                    new StackBasedScope(""));
+        ComplexScope funcScope = new ComplexScope(parentScope.global, new StackBasedScope());
 
         // Add the localScope
         funcScope.local.addStack(localScope);

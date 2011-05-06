@@ -15,8 +15,7 @@ public class ComplexScope extends Scope {
     public Scope global;
     public StackBasedScope local;
 
-    public ComplexScope(String name, Scope global, StackBasedScope local){
-        super(name);
+    public ComplexScope(Scope global, StackBasedScope local){
         this.global = global;
         this.local = local;
     }
@@ -30,7 +29,7 @@ public class ComplexScope extends Scope {
     public void setVariable(String name, Value value){
 
         // First Try Local Scope
-        if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
+        if(this.local.getVariable(name) != null){
             this.getLocal().setVariable(name, value);
         }
         // Otherwise global
@@ -44,7 +43,7 @@ public class ComplexScope extends Scope {
     public void deleteVariable(String name){
 
         // First Try Local Scope
-        if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
+        if(this.local.getVariable(name) != null){
             this.getLocal().deleteVariable(name);
         }
         // Otherwise global
@@ -55,10 +54,10 @@ public class ComplexScope extends Scope {
     }
 
     @Override
-    public Value getVariable(String name){
+    public VariableValue getVariable(String name){
         
         // First Try Local Scope
-        if(this.local.getVariable(name).getType() != ValueType.UNDEFINED){
+        if(this.local.getVariable(name) != null){
             return this.getLocal().getVariable(name);
         }
         // Otherwise global

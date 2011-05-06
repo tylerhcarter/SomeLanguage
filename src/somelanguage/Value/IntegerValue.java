@@ -28,7 +28,7 @@ public class IntegerValue extends Value{
     }
 
     public String toString(){
-        return "(integer)" + this.value + "";
+        return this.value + "";
     }
 
     @Override

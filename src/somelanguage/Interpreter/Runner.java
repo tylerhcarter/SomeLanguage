@@ -6,6 +6,7 @@ import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.ReturnValue;
+import somelanguage.Value.BooleanValue;
 import somelanguage.Value.Value;
 import somelanguage.Value.ValueType;
 
@@ -46,8 +47,6 @@ public class Runner {
 
     private Value parseLine(Scanner statement, ComplexScope fullScope) throws Exception{
 
-        boolean returnValue = false;
-
         Token token = statement.next(false);
 
         // First Resolve Scope
@@ -76,10 +75,12 @@ public class Runner {
             statement.next();
             statement = statement.getTokenToEndStatement();
 
+            return evaluateOperation(statement, fullScope);
+
         }
 
         // Global Declaration
-        if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
+        else if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
 
             // Add variable to scope
             String name = statement.next(2).getTokenValue().toString();
@@ -89,27 +90,34 @@ public class Runner {
             statement.next();
             statement = statement.getTokenToEndStatement();
 
+            return  evaluateOperation(statement, fullScope);
         }
 
         // Return Value
-        if(token.getTokenType() == TokenType.RETURN){
-            returnValue = true;
+        else if(token.getTokenType() == TokenType.RETURN){
 
             // Trim statement
             statement.next();
             statement = statement.getTokenToEndStatement();
+
+            return new ReturnValue(evaluateOperation(statement, fullScope));
         }
 
-        if(statement.getTokens().isEmpty())
-            return new NullValue();
+        else if(token.getTokenType() == TokenType.IF){
 
-        Value value =  evaluateOperation(statement, fullScope);
+            // Trim statement
+            statement.next();
+            statement = statement.getTokenToEndStatement();
+            
+            return evaluateConditional(statement, fullScope);
 
-        if(returnValue == true){
-            value = new ReturnValue(value);
         }
 
-        return value;
+        else {
+
+            return evaluateOperation(statement, fullScope);
+
+        }
         
     }
 
@@ -135,13 +143,139 @@ public class Runner {
      * the current scanner to the end of it
      */
     private Value evaluateOperation(Scanner scanner, ComplexScope scope) throws Exception {
+        return evaluateOperation(scanner.getTokens(), scope);
+    }
 
-        // Get next tokens
-        Scanner operation = scanner.getTokenToEndStatement();
+    private Value evaluateOperation(ArrayList<Token> tokens, ComplexScope scope) throws Exception {
 
         ExpressionEngine math = new ExpressionEngine();
-
-        return math.evaluate(operation.getTokens(), scope);
+        return math.evaluate(tokens, scope);
+        
     }
+
+    private Value evaluateConditional(Scanner statement, ComplexScope fullScope) throws Exception {
+
+        ArrayList<Token> tokens = statement.getTokens();
+
+        System.out.println(tokens);
+
+        // Next token should be a open bracket
+        Token openBracket = tokens.get(0);
+        if(openBracket.getTokenType() != TokenType.OPENBRACKET){
+            throw new Exception("Expecting OPENBRACKET. Found " + openBracket.getTokenType());
+        }
+
+        // Find the close bracket
+        int closeBracket = getCloseBracket(tokens, 0);
+
+        // Get Conditional
+        ArrayList<Token> conditional = slice(tokens, 0, closeBracket);
+
+        System.out.println(conditional);
+
+        System.out.println("Evaluating Conditional: ");
+        // Check if it evaluates to true
+        Value value = evaluateOperation(conditional, fullScope);
+        System.out.println(value);
+        BooleanValue proceed = new BooleanValue("false");
+        
+        try{
+            proceed = (BooleanValue) value;
+        }catch(ClassCastException ex){
+            System.out.println("Could not convert conditional to boolean.");
+        }
+
+        // Check whether to proceed with body
+        if(proceed.getValue() == true){
+
+            // Get the body
+            Token openBrace = tokens.get(0);
+            if(openBrace.getTokenType() != TokenType.OPENBRACES){
+                throw new Exception("Expecting OPENBRACE. Found " + openBracket.getTokenType());
+            }
+
+            // Get Close Brace
+            int closeBrace = getCloseBrace(tokens, 0);
+
+            // Get Conditional
+            ArrayList<Token> body = slice(tokens, 0, closeBrace);
+
+            // Make new function and run
+            Function bodyOp = new Function(this, body, fullScope);
+            Value v = bodyOp.run(new ArrayList<Value>(), fullScope);
+
+            return v;
+
+        }
+
+        return new NullValue();
+    }
+
+    /*
+     * Removes elements between start and end from token array and returns them
+     */
+    private ArrayList<Token> slice(ArrayList<Token> tokens, int start, int end){
+
+        ArrayList<Token> result = new ArrayList<Token>();
+
+        for(int i = start; i < end - 1; i++){
+            Token token = tokens.remove(start + 1);
+            result.add(token);
+        }
+
+        // Get rid of old brackets
+        tokens.remove(start);
+        tokens.remove(start);
+
+        return result;
+
+    }
+
+    /*
+     * Returns the closest close bracket
+     */
+    private int getCloseBracket(ArrayList<Token> tokens, int openBracket) {
+
+        int scopeLevel = 1;
+        for(int i = openBracket + 1; i < tokens.size(); i++){
+
+            if(tokens.get(i).getTokenType() == TokenType.OPENBRACKET){
+                scopeLevel += 1;
+            }
+            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACKET){
+
+                scopeLevel -= 1;
+                if(scopeLevel == 0)
+                    return i;
+            }
+
+        }
+
+        return -1;
+
+    }
+
+    /*
+     * Returns closest close brace
+     */
+    private int getCloseBrace(ArrayList<Token> tokens, int openBracket) {
+
+        int scopeLevel = 1;
+        for(int i = openBracket + 1; i < tokens.size(); i++){
+
+            if(tokens.get(i).getTokenType() == TokenType.OPENBRACES){
+                scopeLevel += 1;
+            }
+            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACES){
+
+                scopeLevel -= 1;
+                if(scopeLevel == 0)
+                    return i;
+            }
+
+        }
+
+        return -1;
+     }
 
 }

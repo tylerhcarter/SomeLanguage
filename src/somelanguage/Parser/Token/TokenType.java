@@ -42,5 +42,6 @@ public enum TokenType {
     USERFUNC,
 
     AND,
-    OR
+    OR,
+    IF,
 };

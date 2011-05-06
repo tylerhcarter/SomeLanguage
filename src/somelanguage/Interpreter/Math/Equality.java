@@ -72,7 +72,11 @@ public class Equality extends MathOperation {
             }
         }
 
-        return getTrue();
+        if(numerator.getType() == ValueType.NULL){
+            return getTrue();
+        }
+
+        return getFalse();
 
     }
 
