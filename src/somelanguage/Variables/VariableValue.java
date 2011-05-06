@@ -24,4 +24,8 @@ public class VariableValue {
         this.value = value;
     }
 
+    public String toString(){
+        return this.value.toString();
+    }
+
 }
