@@ -49,8 +49,6 @@ public class Processor {
 
     private Value parseLine(TokenScanner statement, ComplexScope fullScope) throws Exception{
 
-        System.out.println(statement.getTokens());
-
         Token token = statement.next(false);
 
         // First Resolve Scope
