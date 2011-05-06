@@ -38,7 +38,7 @@ public class BooleanValue extends Value {
 
     @Override
     public Token toToken() {
-        return new Token(TokenType.BOOLEAN);
+        return new Token(TokenType.BOOLEAN, this);
     }
 
 }
