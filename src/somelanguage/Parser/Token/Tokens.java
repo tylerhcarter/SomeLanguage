@@ -3,7 +3,7 @@ package somelanguage.Parser.Token;
 import java.util.ArrayList;
 
 /**
- *
+ * Library of functions for dealing with Tokens
  * @author tylercarter
  */
 public class Tokens {
@@ -51,13 +51,81 @@ public class Tokens {
 
     }
 
+    public static Token getToken(ArrayList<Token> tokens, TokenType searchToken){
+        return tokens.get(findToken(tokens, searchToken));
+    }
+
+    public static Token getToken(ArrayList<Token> tokens, TokenType[] searchTokens){
+        return tokens.get(findToken(tokens, searchTokens));
+    }
+
+    public static Token getToken(ArrayList<Token> tokens, ArrayList<TokenType> searchTokens){
+        return tokens.get(findToken(tokens, searchTokens));
+    }
+
+    public static int findToken(ArrayList<Token> tokens, TokenType searchToken){
+
+        for(int i = 0; i < tokens.size(); i++)
+            if(tokens.get(i).getTokenType() == searchToken)
+                return i;
+
+        return -1;
+        
+    }
+
+    public static int findToken(ArrayList<Token> tokens, TokenType[] searchTokens){
+
+        for(int i = 0; i < tokens.size(); i++)
+            for(TokenType type:searchTokens)
+                if(tokens.get(i).getTokenType() == type)
+                    return i;
+
+        return -1;
+
+    }
+
+    public static int findToken(ArrayList<Token> tokens, ArrayList<TokenType> searchTokens){
+
+        for(int i = 0; i < tokens.size(); i++)
+            for(int x = 0; x < searchTokens.size(); x++)
+                if(tokens.get(i).getTokenType() == searchTokens.get(x))
+                    return i;
+
+        return -1;
+
+    }
+
+    public static boolean hasToken(ArrayList<Token> tokens, TokenType searchToken){
+        if(findToken(tokens, searchToken) != -1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean hasToken(ArrayList<Token> tokens, TokenType[] searchTokens){
+        if(findToken(tokens, searchTokens) != -1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean hasToken(ArrayList<Token> tokens, ArrayList<TokenType> searchTokens){
+        if(findToken(tokens, searchTokens) != -1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     /*
      * Returns the closest close bracket
      */
     private static int getCloseBracket(ArrayList<Token> tokens, int openBracket) {
 
         int scopeLevel = 1;
-        for(int i = openBracket + 1; i < tokens.size(); i++){
+        for(int i = openBracket + 1; i < tokens.size(); i++) {
 
             if(tokens.get(i).getTokenType() == TokenType.OPENBRACKET){
                 scopeLevel += 1;
