@@ -67,32 +67,18 @@ public class Processor {
         }
 
         // Local Declaration
-        if(token.getTokenType() == TokenType.LOCAL_DECLARE){
+        if(token.getTokenType() == TokenType.LOCAL_DECLARE
+                || token.getTokenType() == TokenType.GLOBAL_DECLARE){
 
-            // Add variable to scope
-            String name = statement.next(2).getTokenValue().toString();
-            declareVariable(name, fullScope, true);
+            // Declare variable
+            processDeclaration(statement.getTokens(), fullScope);
 
-            // Trim statement
-            statement.next();
-            statement = statement.getTokenToEndStatement();
+            // Remove declaration token
+            statement.getTokens().remove(0);
 
+            // Evaulate
             return evaluateOperation(statement, fullScope);
 
-        }
-
-        // Global Declaration
-        else if(token.getTokenType() == TokenType.GLOBAL_DECLARE){
-
-            // Add variable to scope
-            String name = statement.next(2).getTokenValue().toString();
-            declareVariable(name, fullScope, false);
-
-            // Trim statement
-            statement.next();
-            statement = statement.getTokenToEndStatement();
-
-            return  evaluateOperation(statement, fullScope);
         }
 
         // Return Value
@@ -123,14 +109,33 @@ public class Processor {
         
     }
 
+    private void processDeclaration(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+
+        Token declare = tokens.get(0);
+        Token name = tokens.get(1);
+
+        if(declare.getTokenType() == TokenType.GLOBAL_DECLARE){
+            declareVariable(name.toString(), scope, false);
+        }
+        else if(declare.getTokenType() == TokenType.LOCAL_DECLARE){
+            declareVariable(name.toString(), scope, true);
+        }
+        else{
+            throw new Exception("Expecting GLOBAL_DECLARE or LOCAL_DECLARE. Found " + declare.getTokenType());
+        }
+
+    }
+
     private void declareVariable(String name, ComplexScope scope) throws Exception{
         declareVariable(name, scope, false);
     }
 
     private void declareVariable(String name, ComplexScope scope, boolean local) throws Exception{
-        
+
         if(local == true){
+            System.out.println("Local Declare");
             scope.getLocal().addVariable(name);
+            System.out.println(scope.getVariables());
         }
         else{
             scope.getGlobal().addVariable(name);
