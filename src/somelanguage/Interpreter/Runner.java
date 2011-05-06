@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
+import somelanguage.Parser.Token.Tokens;
 import somelanguage.Value.NullValue;
 import somelanguage.Value.ReturnValue;
 import somelanguage.Value.BooleanValue;
@@ -157,28 +158,13 @@ public class Runner {
 
         ArrayList<Token> tokens = statement.getTokens();
 
-        System.out.println(tokens);
-
-        // Next token should be a open bracket
-        Token openBracket = tokens.get(0);
-        if(openBracket.getTokenType() != TokenType.OPENBRACKET){
-            throw new Exception("Expecting OPENBRACKET. Found " + openBracket.getTokenType());
-        }
-
-        // Find the close bracket
-        int closeBracket = getCloseBracket(tokens, 0);
-
         // Get Conditional
-        ArrayList<Token> conditional = slice(tokens, 0, closeBracket);
+        ArrayList<Token> conditional = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, 0);
 
-        System.out.println(conditional);
-
-        System.out.println("Evaluating Conditional: ");
         // Check if it evaluates to true
         Value value = evaluateOperation(conditional, fullScope);
-        System.out.println(value);
-        BooleanValue proceed = new BooleanValue("false");
         
+        BooleanValue proceed = new BooleanValue("false");
         try{
             proceed = (BooleanValue) value;
         }catch(ClassCastException ex){
@@ -188,17 +174,8 @@ public class Runner {
         // Check whether to proceed with body
         if(proceed.getValue() == true){
 
-            // Get the body
-            Token openBrace = tokens.get(0);
-            if(openBrace.getTokenType() != TokenType.OPENBRACES){
-                throw new Exception("Expecting OPENBRACE. Found " + openBracket.getTokenType());
-            }
-
-            // Get Close Brace
-            int closeBrace = getCloseBrace(tokens, 0);
-
             // Get Conditional
-            ArrayList<Token> body = slice(tokens, 0, closeBrace);
+            ArrayList<Token> body = Tokens.sliceBody(tokens, TokenType.OPENBRACES, 0);
 
             // Make new function and run
             Function bodyOp = new Function(this, body, fullScope);
@@ -210,72 +187,5 @@ public class Runner {
 
         return new NullValue();
     }
-
-    /*
-     * Removes elements between start and end from token array and returns them
-     */
-    private ArrayList<Token> slice(ArrayList<Token> tokens, int start, int end){
-
-        ArrayList<Token> result = new ArrayList<Token>();
-
-        for(int i = start; i < end - 1; i++){
-            Token token = tokens.remove(start + 1);
-            result.add(token);
-        }
-
-        // Get rid of old brackets
-        tokens.remove(start);
-        tokens.remove(start);
-
-        return result;
-
-    }
-
-    /*
-     * Returns the closest close bracket
-     */
-    private int getCloseBracket(ArrayList<Token> tokens, int openBracket) {
-
-        int scopeLevel = 1;
-        for(int i = openBracket + 1; i < tokens.size(); i++){
-
-            if(tokens.get(i).getTokenType() == TokenType.OPENBRACKET){
-                scopeLevel += 1;
-            }
-            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACKET){
-
-                scopeLevel -= 1;
-                if(scopeLevel == 0)
-                    return i;
-            }
-
-        }
-
-        return -1;
-
-    }
-
-    /*
-     * Returns closest close brace
-     */
-    private int getCloseBrace(ArrayList<Token> tokens, int openBracket) {
-
-        int scopeLevel = 1;
-        for(int i = openBracket + 1; i < tokens.size(); i++){
-
-            if(tokens.get(i).getTokenType() == TokenType.OPENBRACES){
-                scopeLevel += 1;
-            }
-            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACES){
-
-                scopeLevel -= 1;
-                if(scopeLevel == 0)
-                    return i;
-            }
-
-        }
-
-        return -1;
-     }
 
 }

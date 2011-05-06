@@ -12,6 +12,7 @@ import somelanguage.Interpreter.Math.Subtract;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
+import somelanguage.Parser.Token.Tokens;
 import somelanguage.Value.BooleanValue;
 import somelanguage.Value.FunctionValue;
 import somelanguage.Value.NullValue;
@@ -128,13 +129,7 @@ public class ExpressionEngine {
                     throw new Exception("Attempted to call a non-function.");
                 }
 
-                // Get Arguments
-                int closeBracket = getCloseBracket(tokens, i + 1);
-                if(closeBracket == -1){
-                    throw new Exception("Unmatched Open Bracket.");
-                }
-
-                ArrayList<Token> statement = slice(tokens, i + 1, closeBracket);
+                ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
                 tokens.remove(i);
 
                 ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
@@ -187,12 +182,8 @@ public class ExpressionEngine {
 
             else if(token.getTokenType() == TokenType.OPENBRACKET)
             {
-                int closeBracket = getCloseBracket(tokens, i);
-                if(closeBracket == -1){
-                    throw new Exception("Unmatched Open Bracket.");
-                }
 
-                ArrayList<Token> subExpression = slice(tokens, i, closeBracket);
+                ArrayList<Token> subExpression = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i);
 
                 // Evaluate the expression and insert it in place of the expression
                 tokens.add(i, new Token(TokenType.INTEGER, evaluate(subExpression, scope)));
@@ -232,7 +223,7 @@ public class ExpressionEngine {
                 // Divide and replace with new token
                 scope.setVariable(name, value);
 
-                slice(tokens, i-1, i+1);
+                Tokens.slice(tokens, i-1, i+1);
                 tokens.add(i - 1, new Token(TokenType.BOOLEAN, new BooleanValue("true")));
 
                 i = 0;
@@ -253,10 +244,17 @@ public class ExpressionEngine {
 
             if(token.getTokenType() == TokenType.FUNCTION_DECLARE){
 
+                // Remove the function declare
+                tokens.remove(i);
+
+                // Get function
                 Value value = getFunction(tokens, scope);
                 String name = ((FunctionValue) value).getName();
+
+                // Add reference to global scope
                 scope.global.addVariable(name, value);
 
+                // Add reference to statement
                 tokens.add(i, new Token(TokenType.USERFUNC, value));
 
                 i = 0;
@@ -277,13 +275,8 @@ public class ExpressionEngine {
             // Look for opening brace
             if(token.getTokenType() == TokenType.OPENBRACES){
 
-                // Get close brace
-                int closeBrace = getCloseBrace(tokens, i);
-
                 // Get all braces between
-                ArrayList<Token> statement = slice(tokens, i - 1, closeBrace);
-
-                statement.remove(0);
+                ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACES, i);
 
                 // Return them as a function
                 return new UserFunctionValue(statement, scope);
@@ -294,73 +287,6 @@ public class ExpressionEngine {
 
         return new NullValue();
     }
-
-    /*
-     * Removes elements between start and end from token array and returns them
-     */
-    private ArrayList<Token> slice(ArrayList<Token> tokens, int start, int end){
-
-        ArrayList<Token> result = new ArrayList<Token>();
-
-        for(int i = start; i < end - 1; i++){
-            Token token = tokens.remove(start + 1);
-            result.add(token);
-        }
-
-        // Get rid of old brackets
-        tokens.remove(start);
-        tokens.remove(start);
-
-        return result;
-
-    }
-
-    /*
-     * Returns the closest close bracket
-     */
-    private int getCloseBracket(ArrayList<Token> tokens, int openBracket) {
-
-        int scopeLevel = 1;
-        for(int i = openBracket + 1; i < tokens.size(); i++){
-
-            if(tokens.get(i).getTokenType() == TokenType.OPENBRACKET){
-                scopeLevel += 1;
-            }
-            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACKET){
-
-                scopeLevel -= 1;
-                if(scopeLevel == 0)
-                    return i;
-            }
-
-        }
-
-        return -1;
-
-    }
-
-    /*
-     * Returns closest close brace
-     */
-    private int getCloseBrace(ArrayList<Token> tokens, int openBracket) {
-
-        int scopeLevel = 1;
-        for(int i = openBracket + 1; i < tokens.size(); i++){
-            
-            if(tokens.get(i).getTokenType() == TokenType.OPENBRACES){
-                scopeLevel += 1;
-            }
-            else if(tokens.get(i).getTokenType() == TokenType.CLOSEBRACES){
-
-                scopeLevel -= 1;
-                if(scopeLevel == 0)
-                    return i;
-            }
-
-        }
-
-        return -1;
-     }
 
 }
 
