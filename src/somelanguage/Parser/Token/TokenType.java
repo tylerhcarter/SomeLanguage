@@ -44,4 +44,6 @@ public enum TokenType {
     AND,
     OR,
     IF,
+    ELIF,
+    ELSE
 };

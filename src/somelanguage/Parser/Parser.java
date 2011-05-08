@@ -48,6 +48,8 @@ public class Parser{
         keywords.add(new Keyword("function", TokenType.FUNCTION_DECLARE));
         keywords.add(new Keyword("return", TokenType.RETURN));
         keywords.add(new Keyword("if", TokenType.IF));
+        keywords.add(new Keyword("elif", TokenType.ELIF));
+        keywords.add(new Keyword("else", TokenType.ELSE));
     }
 
     public ArrayList<Token> parse(String text) {
