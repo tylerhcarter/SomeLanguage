@@ -256,15 +256,12 @@ public class Processor {
      * This is useful for body statements that have the same scope, but aren't
      * always executed.
      */
-    private Value runFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
-        return runFunction(tokens, scope, new ArrayList<Value>());
-    }
 
-    private Value runFunction(ArrayList<Token> tokens, ComplexScope scope, ArrayList<Value> arguments) throws Exception{
+    private Value runFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Make new function and run
         Function bodyOp = new Function(this, tokens, scope);
-        Value value = bodyOp.run(arguments, scope);
+        Value value = bodyOp.run(scope);
 
         return value;
         

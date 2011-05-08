@@ -51,7 +51,7 @@ public class Main {
             Main.scope = new ComplexScope(globalScope, localScope);
 
             Function main = new Function(Main.runner, tokens, Main.scope);
-            Value value = main.run(new ArrayList<Value>(), Main.scope);
+            Value value = main.run(Main.scope);
             
             System.out.println("Final Value: " + value);
             
