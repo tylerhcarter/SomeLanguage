@@ -57,6 +57,8 @@ public class ExpressionProcessor {
         // Preform function calls
         doFunctionCalls(tokens, scope);
 
+        System.out.println(tokens);
+
         // Math
         doBrackets(tokens, scope);
 
@@ -120,29 +122,8 @@ public class ExpressionProcessor {
                 ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
                 tokens.remove(i);
 
-                ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
-
-                arguments.add(new ArrayList<Token>());
-                int k = 0;
-                for(int o = 0; o < statement.size(); o++){
-
-                    if(statement.get(o).getTokenType() == TokenType.COMMA){
-                        arguments.add(new ArrayList<Token>());
-                        k++;
-                    }else{
-                        arguments.get(k).add(statement.get(o));
-                    }
-
-                }
-
-                ArrayList<Value> argumentValues = new ArrayList<Value>();
-                for(int x = 0; x < arguments.size(); x++){
-                    Value t = evaluate(arguments.get(x), scope);
-                    argumentValues.add(t);
-                }
-
                 // Call it
-                Value returnValue = value.call(argumentValues, scope);
+                Value returnValue = callFunc(value, statement, scope);
 
                 // Insert Return Value
                 tokens.add(i, returnValue.toToken());
@@ -156,52 +137,60 @@ public class ExpressionProcessor {
                 String name = token.getTokenValue().toString();
 
                 // Get Variable Value
-                Value v = scope.getVariable(name).getValue();
-
-                // Convert Variable Value to FunctionValue
-                FunctionValue value;
-                try{
-                    value = (FunctionValue) v;
-                }catch(ClassCastException ex){
-                    System.out.println(ex);
-                    throw new Exception("Attempted to call a non-function.");
-                }
+                Value value = scope.getVariable(name).getValue();
 
                 ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
                 tokens.remove(i);
 
-                ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
-                ArrayList<Value> argumentValues = new ArrayList<Value>();
-                
-                if(statement.size() > 0 ){
-                    arguments.add(new ArrayList<Token>());
-                    int k = 0;
-                    for(int o = 0; o < statement.size(); o++){
-
-                        if(statement.get(o).getTokenType() == TokenType.COMMA){
-                            arguments.add(new ArrayList<Token>());
-                            k++;
-                        }else{
-                            arguments.get(k).add(statement.get(o));
-                        }
-
-                    }
-
-                    
-                    for(int x = 0; x < arguments.size(); x++){
-                        Value t = evaluate(arguments.get(x), scope);
-                        argumentValues.add(t);
-                    }
-                }
-
                 // Call it
-                Value returnValue = value.call(argumentValues, scope);
+                Value returnValue = callFunc(value, statement, scope);
 
                 // Insert Return Value
                 tokens.add(i, returnValue.toToken());
             }
 
         }
+
+    }
+
+    private Value callFunc(Value function, ArrayList<Token> argumentTokens, ComplexScope scope) throws Exception{
+
+        // Convert Variable Value to FunctionValue
+        FunctionValue fValue;
+        try{
+            fValue = (FunctionValue) function;
+        }catch(ClassCastException ex){
+            System.out.println(ex);
+            throw new Exception("Attempted to call a non-function.");
+        }
+
+        ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
+
+        arguments.add(new ArrayList<Token>());
+        int k = 0;
+        for(int o = 0; o < argumentTokens.size(); o++){
+
+            if(argumentTokens.get(o).getTokenType() == TokenType.COMMA){
+                arguments.add(new ArrayList<Token>());
+                k++;
+            }else{
+                arguments.get(k).add(argumentTokens.get(o));
+            }
+
+        }
+
+        ArrayList<Value> argumentValues = new ArrayList<Value>();
+        for(int x = 0; x < arguments.size(); x++){
+            Value t = evaluate(arguments.get(x), scope);
+            argumentValues.add(t);
+        }
+
+        System.out.println(argumentValues);
+
+        // Call it
+        Value value = fValue.call(argumentValues, scope);
+
+        return value;
 
     }
 
