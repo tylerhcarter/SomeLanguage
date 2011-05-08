@@ -1,11 +1,8 @@
 package somelanguage.Variables;
 
-import somelanguage.Variables.StackBasedScope;
-import somelanguage.Variables.Variable;
 import java.util.ArrayList;
 import java.util.Collection;
 import somelanguage.Value.Value;
-import somelanguage.Value.ValueType;
 
 /**
  *
@@ -13,9 +10,9 @@ import somelanguage.Value.ValueType;
  */
 public class ComplexScope extends Scope {
     public Scope global;
-    public StackBasedScope local;
+    public Scope local;
 
-    public ComplexScope(Scope global, StackBasedScope local){
+    public ComplexScope(Scope global, Scope local){
         this.global = global;
         this.local = local;
     }
@@ -94,14 +91,14 @@ public class ComplexScope extends Scope {
     /**
      * @return the local
      */
-    public StackBasedScope getLocal() {
+    public Scope getLocal() {
         return local;
     }
 
     /**
      * @param local the local to set
      */
-    public void setLocal(StackBasedScope local) {
+    public void setLocal(Scope local) {
         this.local = local;
     }
 

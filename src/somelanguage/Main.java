@@ -44,8 +44,7 @@ public class Main {
             globalScope.addVariable("echo", new Echo());
             globalScope.addVariable("print", new Print());
 
-            StackBasedScope localScope = new StackBasedScope();
-            localScope.addStack();
+            Scope localScope = new Scope();
 
             // Combines the two scopes
             Main.scope = new ComplexScope(globalScope, localScope);

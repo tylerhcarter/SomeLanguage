@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import somelanguage.Interpreter.Processor;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Value.Value;
+import somelanguage.Variables.Scope;
 
 /**
  * Creates and environment and processes tokens inside of it
@@ -15,12 +16,12 @@ import somelanguage.Value.Value;
 public class Function {
     private final ArrayList<Token> tokens;
     private final Processor runner;
-    private final ArrayList<Variable> localScope;
+    private final Scope localScope;
 
     public Function (Processor runner, ArrayList<Token> tokens, ComplexScope scope){
         
         // Save a copy of the current scope
-        this.localScope = scope.local.getVariables();
+        this.localScope = scope.local;
 
         this.tokens = tokens;
         this.runner = runner;
@@ -30,7 +31,6 @@ public class Function {
 
         // Set up environment
         ComplexScope funcScope = createScope(parentScope);
-
 
         // Run Script
         Value value = this.runner.run(this.tokens, funcScope);
@@ -43,13 +43,7 @@ public class Function {
     private ComplexScope createScope(ComplexScope parentScope){
 
         // Make new scope
-        ComplexScope funcScope = new ComplexScope(parentScope.global, new StackBasedScope());
-
-        // Add the localScope
-        funcScope.local.addStack(localScope);
-
-        // Add function scope
-        funcScope.local.addStack();
+        ComplexScope funcScope = new ComplexScope(parentScope.global, this.localScope);
 
         return funcScope;
     }

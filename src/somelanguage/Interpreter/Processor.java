@@ -1,6 +1,6 @@
 package somelanguage.Interpreter;
 
-import somelanguage.Interpreter.Math.ExpressionProcessor;
+import somelanguage.Interpreter.Expressions.ExpressionProcessor;
 import java.util.ArrayList;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.Token;
@@ -50,21 +50,6 @@ public class Processor {
     private Value parseLine(TokenScanner statement, ComplexScope fullScope) throws Exception{
 
         Token token = statement.next(false);
-
-        // First Resolve Scope
-        if(token.getTokenType() == TokenType.CLOSEBRACES 
-                || token.getTokenType() == TokenType.OPENBRACES){
-
-            if(token.getTokenType() == TokenType.CLOSEBRACES)
-                fullScope.local.removeStack("Anonymous Scope");
-            else
-                fullScope.local.addStack("Anonymous Scope");
-
-            // Scan past the bracket
-            statement.next();
-            token = statement.next(false);
-            statement = statement.getTokenToEndStatement();
-        }
 
         // Local Declaration
         if(token.getTokenType() == TokenType.LOCAL_DECLARE
