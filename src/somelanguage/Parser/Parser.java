@@ -17,6 +17,7 @@ public class Parser{
 
     ArrayList<Token> tokens = new ArrayList<Token>();
     private ArrayList<Keyword> keywords = new ArrayList<Keyword>();
+    private ArrayList<Symbol> symbols = new ArrayList<Symbol>();
 
     public Parser() {
 
@@ -24,38 +25,47 @@ public class Parser{
         keywords.add(new Keyword("global", TokenType.GLOBAL_DECLARE));
         keywords.add(new Keyword("var", TokenType.LOCAL_DECLARE));
         
-        keywords.add(new Keyword("=", TokenType.ASSIGNMENT));
-        keywords.add(new Keyword(";", TokenType.END_STATEMENT));
-
-        keywords.add(new Keyword("==", TokenType.EQUALITY));
-        keywords.add(new Keyword("&&", TokenType.AND));
-        keywords.add(new Keyword("||", TokenType.OR));
-
-        keywords.add(new Keyword("+", TokenType.ADD));
-        keywords.add(new Keyword("-", TokenType.SUBTRACT));
-        keywords.add(new Keyword("/", TokenType.DIVIDE));
-        keywords.add(new Keyword("*", TokenType.MULTIPLY));
-
-        keywords.add(new Keyword(",", TokenType.COMMA));
-
-        keywords.add(new Keyword("\"", TokenType.QUOTE));
-        keywords.add(new Keyword("(", TokenType.OPENBRACKET));
-        keywords.add(new Keyword(")", TokenType.CLOSEBRACKET));
-
-        keywords.add(new Keyword("{", TokenType.OPENBRACES));
-        keywords.add(new Keyword("}", TokenType.CLOSEBRACES));
-
         keywords.add(new Keyword("function", TokenType.FUNCTION_DECLARE));
         keywords.add(new Keyword("return", TokenType.RETURN));
         keywords.add(new Keyword("if", TokenType.IF));
         keywords.add(new Keyword("elif", TokenType.ELIF));
         keywords.add(new Keyword("else", TokenType.ELSE));
+
+        // Symbols
+        symbols.add(new Symbol(";", TokenType.END_STATEMENT));
+        symbols.add(new Symbol("=", TokenType.ASSIGNMENT));
+        symbols.add(new Symbol(";", TokenType.END_STATEMENT));
+
+        symbols.add(new Symbol("==", TokenType.EQUALITY));
+        symbols.add(new Symbol("&&", TokenType.AND));
+        symbols.add(new Symbol("||", TokenType.OR));
+
+        symbols.add(new Symbol("+", TokenType.ADD));
+        symbols.add(new Symbol("-", TokenType.SUBTRACT));
+        symbols.add(new Symbol("/", TokenType.DIVIDE));
+        symbols.add(new Symbol("*", TokenType.MULTIPLY));
+
+        symbols.add(new Symbol("\"", TokenType.QUOTE));
+
+        symbols.add(new Symbol(",", TokenType.COMMA));
+
+        symbols.add(new Symbol("(", TokenType.OPENBRACKET));
+        symbols.add(new Symbol(")", TokenType.CLOSEBRACKET));
+
+        symbols.add(new Symbol("{", TokenType.OPENBRACES));
+        symbols.add(new Symbol("}", TokenType.CLOSEBRACES));
+        
     }
 
     public ArrayList<Token> parse(String text) {
-        String[] strings = text.split(" ");
 
-        // Parse the inital set of tokens
+        // Add an end statement
+        text += ";";
+
+        // Split up everything
+        String[] strings = text.split("");
+
+        // Parse all tokens
         for(String string:strings){
             addToken(string);
         }
@@ -63,50 +73,65 @@ public class Parser{
         // Search for Encapsulated strings
         parseEncapsulatedStrings();
 
-
         return this.tokens;
     }
 
+    private String buffer = "";
+
     private void addToken(String string) {
-        ArrayList<Token> endBuffer = new ArrayList<Token>();
 
-        // Check if a semicolon is at the end
-        if(string.endsWith(";")){
-            string = string.substring(0, string.length() - 1);
-            endBuffer.add(new Token(TokenType.END_STATEMENT));
+        // Clear empty buffer
+        if(buffer.equals(" ")){
+            buffer = "";
         }
 
-        // Check for beginning or end quotes
-        if(string.startsWith("\"")){
-            string = string.substring(1);
-            this.tokens.add(new Token(TokenType.QUOTE));
+        // Check if it is a symbol
+        if(isSymbol(string)){
+
+            if(!buffer.equals("")){
+                // Add buffer
+                evaluateString(buffer);
+                buffer = "";
+            }
+
+            // Add symbol
+            this.tokens.add(convertSymbol(string));
         }
 
-        if(string.endsWith("\"")){
-            string = string.substring(0, string.length() - 1);
-            endBuffer.add(0, new Token(TokenType.QUOTE));
+        else if(string.equals(" ")){
+
+            if(!buffer.equals("")){
+                // Add buffer
+                evaluateString(buffer);
+                buffer = "";
+            }
+
         }
 
-        // Nothing left? We're done here
-        if(string.equals("")){
-            this.tokens.addAll(endBuffer);
-            return;
+        // Otherwise add it to the buffer
+        else{
+            this.buffer += string;
         }
 
-        // Try to convert to a keyword
+    }
+
+    private void evaluateString(String string){
+
+        // Check for a keyword
         if(isKeyword(string)){
             this.tokens.add(convertKeyword(string));
         }
 
-        // Check if it is an integer
+        // Integer?
         else if(isInteger(string)){
-            this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
+             this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
         }
 
-        // Try boolean values
+         // Try boolean values
         else if(string.equals("true")){
             this.tokens.add(new Token(TokenType.BOOLEAN, new BooleanValue("true")));
         }
+
         else if(string.equals("false")){
             this.tokens.add(new Token(TokenType.BOOLEAN, new BooleanValue("false")));
         }
@@ -118,11 +143,8 @@ public class Parser{
 
         // Otherwise it is a string/variable name
         else{
-            this.tokens.add(new Token(TokenType.STRING, new StringValue(string)));            
+            this.tokens.add(new Token(TokenType.STRING, new StringValue(string)));
         }
-        
-        // Add end buffer
-        this.tokens.addAll(endBuffer);
     }
 
     private Token convertKeyword(String string) {
@@ -223,6 +245,26 @@ public class Parser{
 
         return result;
 
+    }
+
+    private Token convertSymbol(String string) {
+
+        for(Symbol symbol:(Iterable<Symbol>)this.symbols){
+            if(symbol.getKeyword().equals(string))
+                return new Token(symbol.getTokenType());
+        }
+
+        throw new IllegalArgumentException("Input is not a valid symbol.");
+
+    }
+
+    private boolean isSymbol(String string) {
+        try{
+            convertSymbol(string);
+            return true;
+        }catch(Exception ex){
+            return false;
+        }
     }
 
     

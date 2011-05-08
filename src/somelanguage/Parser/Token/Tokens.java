@@ -1,6 +1,7 @@
 package somelanguage.Parser.Token;
 
 import java.util.ArrayList;
+import somelanguage.Interpreter.SyntaxException;
 
 /**
  * Library of functions for dealing with Tokens
@@ -32,7 +33,7 @@ public class Tokens {
 
         Token open = tokens.get(start);
         if(open.getTokenType() != type){
-            throw new Exception("Expecting " + type + " found " + open.getTokenType());
+            throw new SyntaxException("Expecting " + type + " found " + open.getTokenType(), tokens);
         }
 
         // Get close position
@@ -42,7 +43,7 @@ public class Tokens {
         }else if(type == TokenType.OPENBRACKET){
             close = getCloseBracket(tokens, start);
         }else{
-            throw new Exception("Expecting OPENBRACE or OPENBRACKET.");
+            throw new SyntaxException("Expecting OPENBRACE or OPENBRACKET.", tokens);
         }
 
         // Get values inbetween

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import somelanguage.Functions.Echo;
 import somelanguage.Functions.Print;
 import somelanguage.Interpreter.Processor;
-import somelanguage.Value.Value;
+import somelanguage.Interpreter.SyntaxException;
 
 /**
  *
@@ -49,11 +49,16 @@ public class Main {
             Main.scope = new ComplexScope(globalScope, localScope);
 
             Function main = new Function(Main.runner, tokens, Main.scope);
-            Value value = main.run(Main.scope);
+            main.run(Main.scope);
             
-            System.out.println("Final Value: " + value);
-            
-        } catch (Exception ex) {
+        }
+
+        catch (SyntaxException ex) {
+            System.out.println("Cause: " + ex.getTokens());
+            throw ex;
+        }
+        
+        catch (Exception ex) {
             throw ex;
         }
 
