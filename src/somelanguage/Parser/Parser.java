@@ -32,6 +32,7 @@ public class Parser{
         keywords.add(new Keyword("else", TokenType.ELSE));
 
         // Symbols
+        symbols.add(new Symbol(";", TokenType.END_STATEMENT));
         symbols.add(new Symbol("=", TokenType.ASSIGNMENT));
         symbols.add(new Symbol(";", TokenType.END_STATEMENT));
 
