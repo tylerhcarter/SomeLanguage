@@ -3,7 +3,6 @@ package somelanguage;
 import somelanguage.Interpreter.Function;
 import somelanguage.Variables.Scope;
 import somelanguage.Variables.ComplexScope;
-import somelanguage.Variables.StackBasedScope;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

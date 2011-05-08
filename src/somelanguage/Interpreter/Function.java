@@ -1,10 +1,7 @@
 package somelanguage.Interpreter;
 
 import somelanguage.Variables.ComplexScope;
-import somelanguage.Variables.StackBasedScope;
-import somelanguage.Variables.Variable;
 import java.util.ArrayList;
-import somelanguage.Interpreter.Processor;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Value.Value;
 import somelanguage.Variables.Scope;
