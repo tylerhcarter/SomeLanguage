@@ -323,30 +323,33 @@ public class ExpressionProcessor {
 
                 // Separate by comma
                 ArrayList<ArrayList<Token>> parameterValues = new ArrayList<ArrayList<Token>>();
-                
-                parameterValues.add(new ArrayList<Token>());
-                int k = 0;
-                for(int o = 0; o < parameterTokens.size(); o++){
-
-                    if(parameterTokens.get(o).getTokenType() == TokenType.COMMA){
-                        parameterValues.add(new ArrayList<Token>());
-                        k++;
-                    }else{
-                        parameterValues.get(k).add(parameterTokens.get(o));
-                    }
-
-                }
-
                 ArrayList<StringValue> argumentValues = new ArrayList<StringValue>();
-                for(int x = 0; x < parameterValues.size(); x++){
-                    if(parameterValues.get(x).size() > 1){
-                        throw new Exception("Badly Fomred Parameter List");
+                
+                if(!parameterTokens.isEmpty()){
+                    parameterValues.add(new ArrayList<Token>());
+                    int k = 0;
+                    for(int o = 0; o < parameterTokens.size(); o++){
+
+                        if(parameterTokens.get(o).getTokenType() == TokenType.COMMA){
+                            parameterValues.add(new ArrayList<Token>());
+                            k++;
+                        }else{
+                            parameterValues.get(k).add(parameterTokens.get(o));
+                        }
+
                     }
 
-                    try{
-                        argumentValues.add((StringValue) parameterValues.get(x).get(0).getTokenValue());
-                    }catch(ClassCastException ex){
-                        throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
+
+                    for(int x = 0; x < parameterValues.size(); x++){
+                        if(parameterValues.get(x).size() > 1){
+                            throw new Exception("Badly Fomred Parameter List");
+                        }
+
+                        try{
+                            argumentValues.add((StringValue) parameterValues.get(x).get(0).getTokenValue());
+                        }catch(ClassCastException ex){
+                            throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
+                        }
                     }
                 }
 
