@@ -1,4 +1,4 @@
-package somelanguage.Interpreter.Math;
+package somelanguage.Interpreter.Expressions;
 
 import java.util.ArrayList;
 import somelanguage.Variables.ComplexScope;
@@ -171,24 +171,27 @@ public class ExpressionProcessor {
                 tokens.remove(i);
 
                 ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
+                ArrayList<Value> argumentValues = new ArrayList<Value>();
+                
+                if(statement.size() > 0 ){
+                    arguments.add(new ArrayList<Token>());
+                    int k = 0;
+                    for(int o = 0; o < statement.size(); o++){
 
-                arguments.add(new ArrayList<Token>());
-                int k = 0;
-                for(int o = 0; o < statement.size(); o++){
+                        if(statement.get(o).getTokenType() == TokenType.COMMA){
+                            arguments.add(new ArrayList<Token>());
+                            k++;
+                        }else{
+                            arguments.get(k).add(statement.get(o));
+                        }
 
-                    if(statement.get(o).getTokenType() == TokenType.COMMA){
-                        arguments.add(new ArrayList<Token>());
-                        k++;
-                    }else{
-                        arguments.get(k).add(statement.get(o));
                     }
 
-                }
-
-                ArrayList<Value> argumentValues = new ArrayList<Value>();
-                for(int x = 0; x < arguments.size(); x++){
-                    Value t = evaluate(arguments.get(x), scope);
-                    argumentValues.add(t);
+                    
+                    for(int x = 0; x < arguments.size(); x++){
+                        Value t = evaluate(arguments.get(x), scope);
+                        argumentValues.add(t);
+                    }
                 }
 
                 // Call it
@@ -313,7 +316,7 @@ public class ExpressionProcessor {
         ArrayList<Token> body = getBody(tokens);
 
         // Return them as a function
-        return new UserFunctionValue(body, scope);
+        return new UserFunctionValue(body, parameters, scope);
         
     }
 
@@ -331,7 +334,7 @@ public class ExpressionProcessor {
 
                 // Separate by comma
                 ArrayList<ArrayList<Token>> parameterValues = new ArrayList<ArrayList<Token>>();
-
+                
                 parameterValues.add(new ArrayList<Token>());
                 int k = 0;
                 for(int o = 0; o < parameterTokens.size(); o++){
@@ -346,13 +349,13 @@ public class ExpressionProcessor {
                 }
 
                 ArrayList<StringValue> argumentValues = new ArrayList<StringValue>();
-                for(int x = 0; x < parameterTokens.size(); x++){
+                for(int x = 0; x < parameterValues.size(); x++){
                     if(parameterValues.get(x).size() > 1){
                         throw new Exception("Badly Fomred Parameter List");
                     }
 
                     try{
-                        argumentValues.add((StringValue) parameterValues.get(0).get(0).getTokenValue());
+                        argumentValues.add((StringValue) parameterValues.get(x).get(0).getTokenValue());
                     }catch(ClassCastException ex){
                         throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
                     }

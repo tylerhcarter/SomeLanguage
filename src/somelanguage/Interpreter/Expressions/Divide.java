@@ -1,4 +1,4 @@
-package somelanguage.Interpreter.Math;
+package somelanguage.Interpreter.Expressions;
 
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
@@ -6,18 +6,18 @@ import somelanguage.Value.IntegerValue;
 import somelanguage.Variables.ComplexScope;
 
 /**
- * 
+ *
  * @author Tyler(Chacha) chacha@chacha102.com
  */
-public class Add extends MathOperation {
+public class Divide extends MathOperation {
 
-    public Add(ExpressionProcessor engine){
+    public Divide(ExpressionProcessor engine){
         super(engine);
     }
 
     @Override
     protected TokenType getSearchToken() {
-        return TokenType.ADD;
+        return TokenType.DIVIDE;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Add extends MathOperation {
             throw new Exception("Could not convert " + expression.getDenominator().getType() + " to IntegerValue.");
         }
 
-        int sum = (numerator.getValue() + denominator.getValue());
+        int sum = (numerator.getValue() / denominator.getValue());
 
         return new Token(TokenType.INTEGER, new IntegerValue(sum));
 

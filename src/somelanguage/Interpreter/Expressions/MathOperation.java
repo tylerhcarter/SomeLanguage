@@ -1,4 +1,4 @@
-package somelanguage.Interpreter.Math;
+package somelanguage.Interpreter.Expressions;
 
 import java.util.ArrayList;
 import somelanguage.Parser.Token.Token;

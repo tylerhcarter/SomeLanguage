@@ -1,4 +1,4 @@
-package somelanguage.Interpreter.Math;
+package somelanguage.Interpreter.Expressions;
 
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
@@ -9,15 +9,15 @@ import somelanguage.Variables.ComplexScope;
  *
  * @author Tyler(Chacha) chacha@chacha102.com
  */
-public class Subtract extends MathOperation {
+public class Multiply extends MathOperation {
 
-    public Subtract(ExpressionProcessor engine){
+    public Multiply(ExpressionProcessor engine){
         super(engine);
     }
 
     @Override
     protected TokenType getSearchToken() {
-        return TokenType.SUBTRACT;
+        return TokenType.MULTIPLY;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Subtract extends MathOperation {
             throw new Exception("Could not convert " + expression.getDenominator().getType() + " to IntegerValue.");
         }
 
-        int sum = (numerator.getValue() - denominator.getValue());
+        int sum = (numerator.getValue() * denominator.getValue());
 
         return new Token(TokenType.INTEGER, new IntegerValue(sum));
 

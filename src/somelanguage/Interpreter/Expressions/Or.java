@@ -1,4 +1,4 @@
-package somelanguage.Interpreter.Math;
+package somelanguage.Interpreter.Expressions;
 
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;

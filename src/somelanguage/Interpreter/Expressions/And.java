@@ -1,7 +1,8 @@
-package somelanguage.Interpreter.Math;
+package somelanguage.Interpreter.Expressions;
 
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
+import somelanguage.Value.BooleanValue;
 import somelanguage.Value.IntegerValue;
 import somelanguage.Variables.ComplexScope;
 
@@ -9,37 +10,39 @@ import somelanguage.Variables.ComplexScope;
  *
  * @author Tyler(Chacha) chacha@chacha102.com
  */
-public class Divide extends MathOperation {
+public class And extends MathOperation {
 
-    public Divide(ExpressionProcessor engine){
+    public And(ExpressionProcessor engine){
         super(engine);
     }
 
     @Override
     protected TokenType getSearchToken() {
-        return TokenType.DIVIDE;
+        return TokenType.AND;
     }
 
     @Override
     protected Token evaluateExpression(Expression expression, ComplexScope scope) throws Exception{
 
-        IntegerValue numerator, denominator;
+        BooleanValue numerator, denominator;
 
         try{
-            numerator = (IntegerValue) expression.getNumerator();
+            numerator = (BooleanValue) expression.getNumerator();
         }catch(ClassCastException ex){
             throw new Exception("Could not convert " + expression.getNumerator().getType() + " to IntegerValue.");
         }
 
         try{
-            denominator = (IntegerValue) expression.getDenominator();
+            denominator = (BooleanValue) expression.getDenominator();
         }catch(ClassCastException ex){
             throw new Exception("Could not convert " + expression.getDenominator().getType() + " to IntegerValue.");
         }
 
-        int sum = (numerator.getValue() / denominator.getValue());
-
-        return new Token(TokenType.INTEGER, new IntegerValue(sum));
+        if(numerator.getValue() == true && denominator.getValue() == true){
+            return new Token(TokenType.BOOLEAN, new BooleanValue("true"));
+        }else{
+            return new Token(TokenType.BOOLEAN, new BooleanValue("false"));
+        }
 
     }
 
