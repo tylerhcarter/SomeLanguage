@@ -82,7 +82,7 @@ public class ExpressionProcessor {
     private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
         Token token = tokens.get(i);
         if(token.getTokenType() == TokenType.STRING){
-            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString()).getValue();
+            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString());
             return value;
 
         }else{
@@ -137,7 +137,7 @@ public class ExpressionProcessor {
                 String name = token.getTokenValue().toString();
 
                 // Get Variable Value
-                Value value = scope.getVariable(name).getValue();
+                Value value = scope.getVariable(name);
 
                 ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
                 tokens.remove(i);

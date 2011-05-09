@@ -1,9 +1,6 @@
 package somelanguage.Variables;
 
-import somelanguage.Variables.Variable;
-import java.util.ArrayList;
 import somelanguage.Value.NullValue;
-import somelanguage.Value.UndefinedValue;
 import somelanguage.Value.Value;
 
 /**
@@ -12,90 +9,55 @@ import somelanguage.Value.Value;
  */
 public class Scope {
 
-    protected ArrayList<Variable> variables = new ArrayList<Variable>();
+    protected Dictionary<Value> variables = new Dictionary<Value>();
 
     public void addVariable(String name) {
-
-        addVariable(name, new NullValue());
-        
+        this.variables.set(name, new NullValue());
     }
 
     public void addVariable(String name, Value value){
 
-        int index = findVariable(name);
-        if(index == -1){
-            addVariable(new Variable(name, value));
+        Value previousValue = this.variables.get(name);
+        if(previousValue != null){
+            System.out.println("Warning: Redeclaring local variable " + name + ".");
         }
-        else{
-            System.out.println("Warning: Redeclaring Local Variable "+ name);
-            
-            setVariable(name, value);
-        }
+
+        this.variables.set(name, value);
         
     }
 
-    public void addVariable(Variable var) {
-        this.variables.add(var);
-    }
+    public Value getVariable(String name){
 
-    public void setVariable(String name, Value value){
-
-        int index = findVariable(name);
-        if(index == -1){
+        Value value = this.variables.get(name);
+        if(value == null){
             System.out.println("Warning: Using local variable " + name + " without declaration.");
-            this.variables.add(new Variable(name, value));
-        }
-        else{
-            Variable object = this.variables.get(index);
-            object.setValue(value);
         }
 
+        return value;
     }
 
-    public void deleteVariable(String name){
+    public Value setVariable(String name, Value value){
 
-        int index = findVariable(name);
-        if(index == -1){
-            System.out.println("Warning: Deleting undefined variable " + name);
-        }else{
-            this.variables.remove(index);
+        Value previousValue = this.variables.get(name);
+        if(previousValue == null){
+            System.out.println("Warning: Using local variable " + name + " without declaration.");
         }
-
+        
+        this.variables.set(name, value);
+        return previousValue;
     }
 
-    protected int findVariable(String name){
+    public Value deleteVariable(String name){
 
-        for(int i = 0; i < this.variables.size(); i++){
-            if(this.variables.get(i).getName().equals(name)){
-                return i;
-            }
+        Value previousValue = this.variables.get(name);
+        if(previousValue == null){
+            System.out.println("Warning: Using local variable " + name + " without declaration.");
         }
 
-        return -1;
-
+        this.variables.remove(name);
+        return previousValue;
     }
 
-    public VariableValue getVariable(String name){
-
-        int index = findVariable(name);
-        if(index == -1){
-            return null;
-        }else{
-            return this.variables.get(index).getValue();
-        }
-
-    }
-
-    protected Variable getVariableObject(String name){
-
-        int index = findVariable(name);
-        if(index == -1){
-            return null;
-        }
-        else{
-            return this.variables.get(index);
-        }
-    }
 
     public String toString(){
 
@@ -104,7 +66,7 @@ public class Scope {
 
     }
 
-    public ArrayList<Variable> getVariables() {
+    public Dictionary<Value> getVariables(){
         return variables;
     }
 

@@ -23,35 +23,35 @@ public class ComplexScope extends Scope {
     }
 
     @Override
-    public void setVariable(String name, Value value){
+    public Value setVariable(String name, Value value){
 
         // First Try Local Scope
         if(this.local.getVariable(name) != null){
-            this.getLocal().setVariable(name, value);
+            return this.getLocal().setVariable(name, value);
         }
         // Otherwise global
         else{
-            this.getGlobal().setVariable(name, value);
+            return this.getGlobal().setVariable(name, value);
         }
 
     }
 
     @Override
-    public void deleteVariable(String name){
+    public Value deleteVariable(String name){
 
         // First Try Local Scope
         if(this.local.getVariable(name) != null){
-            this.getLocal().deleteVariable(name);
+            return this.getLocal().deleteVariable(name);
         }
         // Otherwise global
         else{
-            this.getGlobal().deleteVariable(name);
+            return this.getGlobal().deleteVariable(name);
         }
 
     }
 
     @Override
-    public VariableValue getVariable(String name){
+    public Value getVariable(String name){
         
         // First Try Local Scope
         if(this.local.getVariable(name) != null){
