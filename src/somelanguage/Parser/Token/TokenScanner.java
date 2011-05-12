@@ -1,9 +1,6 @@
-
-package somelanguage.Interpreter;
+package somelanguage.Parser.Token;
 
 import java.util.ArrayList;
-import somelanguage.Parser.Token.Token;
-import somelanguage.Parser.Token.TokenType;
 
 /**
  * Provides an iterable interface for dealing with arrays of tokens
