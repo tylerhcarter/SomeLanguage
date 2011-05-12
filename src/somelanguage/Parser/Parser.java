@@ -101,8 +101,7 @@ public class Parser{
 
         // Integer?
         else if(isInteger(string)){
-            System.out.println("Integer: " + string);
-             this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
+            this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
         }
 
          // Try boolean values

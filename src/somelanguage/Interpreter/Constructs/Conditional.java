@@ -27,8 +27,6 @@ public class Conditional extends Construct{
 
         tokens.remove(0);
 
-        System.out.println(tokens);
-
         // Evaulate
         Value value = executeConditional(processor, tokens, scope);
         return value;

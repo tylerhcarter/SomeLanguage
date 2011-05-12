@@ -3,7 +3,6 @@ package somelanguage.Interpreter.Expressions;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.BooleanValue;
-import somelanguage.Value.IntegerValue;
 import somelanguage.Variables.ComplexScope;
 
 /**
