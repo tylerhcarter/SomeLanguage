@@ -15,7 +15,7 @@ import somelanguage.Variables.ComplexScope;
 public class Return extends Construct{
 
     public TokenType getToken(){
-        return TokenType.LOCAL_DECLARE;
+        return TokenType.RETURN;
     }
 
     @Override
