@@ -66,6 +66,9 @@ public class ExpressionProcessor {
 
         doAssignment(tokens, scope);
 
+        // Get rid of excess end statements
+        cleanEndStatements(tokens);
+
         if(tokens.size() > 1){
             System.out.println(tokens);
             throw new Exception("Badly Formed Expression.");
@@ -349,15 +352,21 @@ public class ExpressionProcessor {
                 }
 
                 ArrayList<StringValue> argumentValues = new ArrayList<StringValue>();
-                for(int x = 0; x < parameterValues.size(); x++){
-                    if(parameterValues.get(x).size() > 1){
-                        throw new Exception("Badly Fomred Parameter List");
-                    }
+                if(!parameterValues.isEmpty()){
+                    for(int x = 0; x < parameterValues.size(); x++){
+                        if(parameterValues.get(x).size() == 0){
+                            continue;
+                        }
 
-                    try{
-                        argumentValues.add((StringValue) parameterValues.get(x).get(0).getTokenValue());
-                    }catch(ClassCastException ex){
-                        throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
+                        if(parameterValues.get(x).size() > 1){
+                            throw new Exception("Badly Formed Parameter List");
+                        }
+
+                        try{
+                            argumentValues.add((StringValue) parameterValues.get(x).get(0).getTokenValue());
+                        }catch(ClassCastException ex){
+                            throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
+                        }
                     }
                 }
 
@@ -389,6 +398,15 @@ public class ExpressionProcessor {
 
         throw new Exception("Could not find function body.");
 
+    }
+
+    private void cleanEndStatements(ArrayList<Token> tokens) {
+        for(int i = 0; i < tokens.size(); i++){
+            if(tokens.get(i).getTokenType() == TokenType.END_STATEMENT){
+                tokens.remove(i);
+                i = 0;
+            }
+        }
     }
 
 }
