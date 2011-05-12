@@ -1,5 +1,7 @@
 package somelanguage.Interpreter;
 
+import somelanguage.Parser.Token.TokenScanner;
+import somelanguage.Interpreter.Constructs.Construct;
 import somelanguage.Interpreter.Expressions.ExpressionProcessor;
 import java.util.ArrayList;
 import somelanguage.Variables.ComplexScope;

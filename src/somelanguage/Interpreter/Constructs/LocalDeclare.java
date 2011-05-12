@@ -3,11 +3,10 @@
  * and open the template in the editor.
  */
 
-package somelanguage.Constructs;
+package somelanguage.Interpreter.Constructs;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Processor;
-import somelanguage.Interpreter.Construct;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.Value;
@@ -17,7 +16,7 @@ import somelanguage.Variables.ComplexScope;
  *
  * @author tylercarter
  */
-public class GlobalDeclare extends Construct{
+public class LocalDeclare extends Construct{
 
     public TokenType getToken(){
         return TokenType.LOCAL_DECLARE;
@@ -34,7 +33,7 @@ public class GlobalDeclare extends Construct{
 
         // Evaulate
         return processor.evaluateOperation(tokens, scope);
-
+        
     }
 
     private void processDeclaration(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
@@ -43,7 +42,7 @@ public class GlobalDeclare extends Construct{
     }
 
     private void declareVariable(String name, ComplexScope scope, boolean local) throws Exception{
-        scope.getGlobal().addVariable(name);
+        scope.getLocal().addVariable(name);
     }
 
 }

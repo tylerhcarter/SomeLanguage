@@ -1,6 +1,7 @@
-package somelanguage.Interpreter;
+package somelanguage.Interpreter.Constructs;
 
 import java.util.ArrayList;
+import somelanguage.Interpreter.Processor;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.Value;
