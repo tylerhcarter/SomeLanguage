@@ -12,9 +12,9 @@ import java.nio.charset.Charset;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Parser;
 import java.util.ArrayList;
-import somelanguage.Functions.Echo;
-import somelanguage.Functions.Print;
-import somelanguage.Interpreter.Construct;
+import somelanguage.Interpreter.Functions.Echo;
+import somelanguage.Interpreter.Functions.Print;
+import somelanguage.Interpreter.Constructs.Construct;
 import somelanguage.Interpreter.Expressions.ExpressionProcessor;
 import somelanguage.Interpreter.Processor;
 import somelanguage.Interpreter.SyntaxException;
@@ -38,18 +38,12 @@ public class Main {
         Main.runner = getProcessor();
         
         try {
+            
             String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
 
-            Scope globalScope = new Scope();
-            globalScope.addVariable("echo", new Echo());
-            globalScope.addVariable("print", new Print());
-
-            Scope localScope = new Scope();
-
-            // Combines the two scopes
-            Main.scope = new ComplexScope(globalScope, localScope);
+            Main.scope = getScope();
 
             Function main = new Function(Main.runner, tokens, Main.scope);
             main.run(Main.scope);
@@ -67,43 +61,78 @@ public class Main {
 
     }
 
-    private static Processor getProcessor(){
+    public static ComplexScope getScope(){
+
+        Scope globalScope = new Scope();
+        globalScope.addVariable("echo", new Echo());
+        globalScope.addVariable("print", new Print());
+
+        Scope localScope = new Scope();
+
+        return new ComplexScope(globalScope, localScope);
+
+    }
+
+    public static Processor getProcessor(){
         ExpressionProcessor expressions = new ExpressionProcessor();
 
         // Constructs
         ArrayList<Construct> constructs = new ArrayList<Construct>();
-        constructs.add(new somelanguage.Constructs.GlobalDeclare());
-        constructs.add(new somelanguage.Constructs.LocalDeclare());
-        constructs.add(new somelanguage.Constructs.Return());
-        constructs.add(new somelanguage.Constructs.Conditional());
-        constructs.add(new somelanguage.Constructs.Echo());
+        
+        constructs.add(new somelanguage.Interpreter.Constructs.GlobalDeclare());
+        constructs.add(new somelanguage.Interpreter.Constructs.LocalDeclare());
+        constructs.add(new somelanguage.Interpreter.Constructs.Return());
+        constructs.add(new somelanguage.Interpreter.Constructs.Conditional());
+        constructs.add(new somelanguage.Interpreter.Constructs.Echo());
 
         return new Processor(expressions, constructs);
     }
 
-    private static Parser getParser(){
+    public static Parser getParser(){
+        somelanguage.Parser.Configuration pConfig = getParserConfig();
+        return new Parser(pConfig);
+    }
+
+    public static somelanguage.Parser.Configuration getParserConfig(){
         somelanguage.Parser.Configuration pConfig = new somelanguage.Parser.Configuration();
 
         // Create Keywords
         pConfig.addKeyword("global", TokenType.GLOBAL_DECLARE);
         pConfig.addKeyword("var", TokenType.LOCAL_DECLARE);
+        pConfig.addKeyword("variable", TokenType.LOCAL_DECLARE);
+        pConfig.addKeyword("make", TokenType.LOCAL_DECLARE);
         pConfig.addKeyword("function", TokenType.FUNCTION_DECLARE);
+        pConfig.addKeyword("create", TokenType.FUNCTION_DECLARE);
         pConfig.addKeyword("return", TokenType.RETURN);
         pConfig.addKeyword("if", TokenType.IF);
         pConfig.addKeyword("elif", TokenType.ELIF);
+        pConfig.addKeyword("eli", TokenType.ELIF);
+        pConfig.addKeyword("el", TokenType.ELIF);
         pConfig.addKeyword("else", TokenType.ELSE);
+        pConfig.addKeyword("els", TokenType.ELSE);
 
         pConfig.addKeyword("echo", TokenType.ECHO);
+        pConfig.addKeyword("say", TokenType.ECHO);
+        pConfig.addKeyword("speak", TokenType.ECHO);
 
         // Create Symbols
         pConfig.addSymbol(";", TokenType.END_STATEMENT);
         pConfig.addSymbol("=", TokenType.ASSIGNMENT);
+        pConfig.addKeyword("equals", TokenType.ASSIGNMENT);
+        pConfig.addKeyword("equal", TokenType.ASSIGNMENT);
         pConfig.addSymbol("==", TokenType.EQUALITY);
         pConfig.addSymbol("&&", TokenType.AND);
+        pConfig.addSymbol("&", TokenType.AND);
+        pConfig.addKeyword("AND", TokenType.AND);
         pConfig.addSymbol("||", TokenType.OR);
+        pConfig.addSymbol("|", TokenType.OR);
+        pConfig.addKeyword("OR", TokenType.OR);
         pConfig.addSymbol("+", TokenType.ADD);
+        pConfig.addKeyword("plus", TokenType.ADD);
         pConfig.addSymbol("-", TokenType.SUBTRACT);
+        pConfig.addKeyword("minus", TokenType.SUBTRACT);
         pConfig.addSymbol("*", TokenType.MULTIPLY);
+        pConfig.addKeyword("times", TokenType.MULTIPLY);
         pConfig.addSymbol("/", TokenType.DIVIDE);
         pConfig.addSymbol("\"", TokenType.QUOTE);
         pConfig.addSymbol(",", TokenType.COMMA);
@@ -112,10 +141,10 @@ public class Main {
         pConfig.addSymbol("{", TokenType.OPENBRACES);
         pConfig.addSymbol("}", TokenType.CLOSEBRACES);
 
-        return new Parser(pConfig);
+        return pConfig;
     }
 
-    private static String cleanCode(String text){
+    public static String cleanCode(String text){
 
         while(true){
 
