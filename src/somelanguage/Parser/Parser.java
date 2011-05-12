@@ -19,42 +19,16 @@ public class Parser{
     private ArrayList<Keyword> keywords = new ArrayList<Keyword>();
     private ArrayList<Symbol> symbols = new ArrayList<Symbol>();
 
-    public Parser() {
+    public Parser(Configuration config) {
 
-        // Basic Keywords
-        keywords.add(new Keyword("global", TokenType.GLOBAL_DECLARE));
-        keywords.add(new Keyword("var", TokenType.LOCAL_DECLARE));
-        
-        keywords.add(new Keyword("function", TokenType.FUNCTION_DECLARE));
-        keywords.add(new Keyword("return", TokenType.RETURN));
-        keywords.add(new Keyword("if", TokenType.IF));
-        keywords.add(new Keyword("elif", TokenType.ELIF));
-        keywords.add(new Keyword("else", TokenType.ELSE));
+        for(Keyword keyword:config.getKeywords()){
+            this.keywords.add(keyword);
+        }
 
-        // Symbols
-        symbols.add(new Symbol(";", TokenType.END_STATEMENT));
-        symbols.add(new Symbol("=", TokenType.ASSIGNMENT));
-        symbols.add(new Symbol(";", TokenType.END_STATEMENT));
+        for(Symbol symbol:config.getSymbols()){
+            this.symbols.add(symbol);
+        }
 
-        symbols.add(new Symbol("==", TokenType.EQUALITY));
-        symbols.add(new Symbol("&&", TokenType.AND));
-        symbols.add(new Symbol("||", TokenType.OR));
-
-        symbols.add(new Symbol("+", TokenType.ADD));
-        symbols.add(new Symbol("-", TokenType.SUBTRACT));
-        symbols.add(new Symbol("/", TokenType.DIVIDE));
-        symbols.add(new Symbol("*", TokenType.MULTIPLY));
-
-        symbols.add(new Symbol("\"", TokenType.QUOTE));
-
-        symbols.add(new Symbol(",", TokenType.COMMA));
-
-        symbols.add(new Symbol("(", TokenType.OPENBRACKET));
-        symbols.add(new Symbol(")", TokenType.CLOSEBRACKET));
-
-        symbols.add(new Symbol("{", TokenType.OPENBRACES));
-        symbols.add(new Symbol("}", TokenType.CLOSEBRACES));
-        
     }
 
     public ArrayList<Token> parse(String text) {
@@ -72,6 +46,9 @@ public class Parser{
 
         // Search for Encapsulated strings
         parseEncapsulatedStrings();
+
+        // Search for Equality Operators
+        parseEquality();
 
         return this.tokens;
     }
@@ -124,6 +101,7 @@ public class Parser{
 
         // Integer?
         else if(isInteger(string)){
+            System.out.println("Integer: " + string);
              this.tokens.add(new Token(TokenType.INTEGER, new IntegerValue(Integer.parseInt(string))));
         }
 
@@ -265,6 +243,34 @@ public class Parser{
         }catch(Exception ex){
             return false;
         }
+    }
+
+    private void parseEquality() {
+
+        for(int i = 0; i < tokens.size(); i++){
+
+            Token token = tokens.get(i);
+
+            // Check for an assignment operator
+            if(token.getTokenType() == TokenType.ASSIGNMENT){
+
+                if(i + 1 < tokens.size()){
+
+                    if(tokens.get(i + 1).getTokenType() ==  TokenType.ASSIGNMENT)
+                    {
+
+                        tokens.remove(i);
+                        tokens.remove(i);
+                        tokens.add(i, new Token(TokenType.EQUALITY));
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
     

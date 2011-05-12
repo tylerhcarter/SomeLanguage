@@ -45,5 +45,7 @@ public enum TokenType {
     OR,
     IF,
     ELIF,
-    ELSE
+    ELSE,
+
+    ECHO
 };

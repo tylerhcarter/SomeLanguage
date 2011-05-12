@@ -14,8 +14,11 @@ import somelanguage.Parser.Parser;
 import java.util.ArrayList;
 import somelanguage.Functions.Echo;
 import somelanguage.Functions.Print;
+import somelanguage.Interpreter.Construct;
+import somelanguage.Interpreter.Expressions.ExpressionProcessor;
 import somelanguage.Interpreter.Processor;
 import somelanguage.Interpreter.SyntaxException;
+import somelanguage.Parser.Token.TokenType;
 
 /**
  *
@@ -31,8 +34,8 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
 
-        Parser parser = new Parser();
-        Main.runner = new Processor();
+        Parser parser = getParser();
+        Main.runner = getProcessor();
         
         try {
             String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
@@ -64,6 +67,54 @@ public class Main {
 
     }
 
+    private static Processor getProcessor(){
+        ExpressionProcessor expressions = new ExpressionProcessor();
+
+        // Constructs
+        ArrayList<Construct> constructs = new ArrayList<Construct>();
+        constructs.add(new somelanguage.Constructs.GlobalDeclare());
+        constructs.add(new somelanguage.Constructs.LocalDeclare());
+        constructs.add(new somelanguage.Constructs.Return());
+        constructs.add(new somelanguage.Constructs.Conditional());
+        constructs.add(new somelanguage.Constructs.Echo());
+
+        return new Processor(expressions, constructs);
+    }
+
+    private static Parser getParser(){
+        somelanguage.Parser.Configuration pConfig = new somelanguage.Parser.Configuration();
+
+        // Create Keywords
+        pConfig.addKeyword("global", TokenType.GLOBAL_DECLARE);
+        pConfig.addKeyword("var", TokenType.LOCAL_DECLARE);
+        pConfig.addKeyword("function", TokenType.FUNCTION_DECLARE);
+        pConfig.addKeyword("return", TokenType.RETURN);
+        pConfig.addKeyword("if", TokenType.IF);
+        pConfig.addKeyword("elif", TokenType.ELIF);
+        pConfig.addKeyword("else", TokenType.ELSE);
+
+        pConfig.addKeyword("echo", TokenType.ECHO);
+
+        // Create Symbols
+        pConfig.addSymbol(";", TokenType.END_STATEMENT);
+        pConfig.addSymbol("=", TokenType.ASSIGNMENT);
+        pConfig.addSymbol("==", TokenType.EQUALITY);
+        pConfig.addSymbol("&&", TokenType.AND);
+        pConfig.addSymbol("||", TokenType.OR);
+        pConfig.addSymbol("+", TokenType.ADD);
+        pConfig.addSymbol("-", TokenType.SUBTRACT);
+        pConfig.addSymbol("*", TokenType.MULTIPLY);
+        pConfig.addSymbol("/", TokenType.DIVIDE);
+        pConfig.addSymbol("\"", TokenType.QUOTE);
+        pConfig.addSymbol(",", TokenType.COMMA);
+        pConfig.addSymbol("(", TokenType.OPENBRACKET);
+        pConfig.addSymbol(")", TokenType.CLOSEBRACKET);
+        pConfig.addSymbol("{", TokenType.OPENBRACES);
+        pConfig.addSymbol("}", TokenType.CLOSEBRACES);
+
+        return new Parser(pConfig);
+    }
+
     private static String cleanCode(String text){
 
         while(true){
@@ -87,6 +138,7 @@ public class Main {
         }
 
         return text;
+        
     }
 
     private static String readFile(String path) throws IOException {
