@@ -1,0 +1,135 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package somelanguage.Interpreter.Compilation;
+
+import java.util.ArrayList;
+import somelanguage.Interpreter.Expressions.ExpressionProcessor;
+import somelanguage.Variables.ComplexScope;
+import somelanguage.Parser.Token.*;
+import somelanguage.Value.*;
+
+/**
+ *
+ * @author tylercarter
+ */
+public class CallingCompiler implements Compiler{
+
+    public void compile(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception{
+
+        if(tokens.isEmpty())
+            return;
+
+        for(int i = 0; i < tokens.size() - 1; i++){
+
+            Token token = tokens.get(i);
+
+            if(token.getTokenType() == TokenType.CLOSEBRACKET){
+                throw new Exception("Unmatched Close Bracket.");
+            }
+
+            else if(token.getTokenType() == TokenType.USERFUNC){
+
+                Value v = token.getTokenValue();
+
+                // Convert Variable Value to FunctionValue
+                FunctionValue value;
+                try{
+                    value = (FunctionValue) v;
+                }catch(ClassCastException ex){
+                    System.out.println(ex);
+                    throw new Exception("Attempted to call a non-function.");
+                }
+
+                ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
+                tokens.remove(i);
+
+                ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
+
+                arguments.add(new ArrayList<Token>());
+                int k = 0;
+                for(int o = 0; o < statement.size(); o++){
+
+                    if(statement.get(o).getTokenType() == TokenType.COMMA){
+                        arguments.add(new ArrayList<Token>());
+                        k++;
+                    }else{
+                        arguments.get(k).add(statement.get(o));
+                    }
+
+                }
+
+                ArrayList<Value> argumentValues = new ArrayList<Value>();
+                for(int x = 0; x < arguments.size(); x++){
+                    Value t = processor.evaluate(arguments.get(x), scope);
+                    argumentValues.add(t);
+                }
+
+                // Call it
+                Value returnValue = value.call(argumentValues, scope);
+
+                // Insert Return Value
+                tokens.add(i, returnValue.toToken());
+
+            }
+
+            else if(token.getTokenType() == TokenType.STRING
+                    && tokens.get(i + 1).getTokenType() == TokenType.OPENBRACKET){
+
+                // Get Variable Name
+                String name = token.getTokenValue().toString();
+
+                System.out.println(scope.getLocal());
+                // Get Variable Value
+                Value v = scope.getVariable(name).getValue();
+
+                // Convert Variable Value to FunctionValue
+                FunctionValue value;
+                try{
+                    value = (FunctionValue) v;
+                }catch(ClassCastException ex){
+                    System.out.println(ex);
+                    throw new Exception("Attempted to call a non-function.");
+                }
+
+                ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
+                tokens.remove(i);
+
+                ArrayList<ArrayList<Token>> arguments = new ArrayList<ArrayList<Token>>();
+                ArrayList<Value> argumentValues = new ArrayList<Value>();
+
+                if(statement.size() > 0 ){
+                    arguments.add(new ArrayList<Token>());
+                    int k = 0;
+                    for(int o = 0; o < statement.size(); o++){
+
+                        if(statement.get(o).getTokenType() == TokenType.COMMA){
+                            arguments.add(new ArrayList<Token>());
+                            k++;
+                        }else{
+                            arguments.get(k).add(statement.get(o));
+                        }
+
+                    }
+
+
+                    for(int x = 0; x < arguments.size(); x++){
+                        Value t = processor.evaluate(arguments.get(x), scope);
+                        argumentValues.add(t);
+                    }
+                }
+
+                // Call it
+                Value returnValue = value.call(argumentValues, scope);
+
+                // Insert Return Value
+                tokens.add(i, returnValue.toToken());
+            }
+
+        }
+
+    }
+
+}
