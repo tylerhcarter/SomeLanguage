@@ -1,22 +1,16 @@
 package somelanguage.Interpreter.Expressions;
 
 import java.util.ArrayList;
+import somelanguage.Interpreter.Compilation.BracketCompiler;
 import somelanguage.Interpreter.Compilation.CallingCompiler;
 import somelanguage.Interpreter.Compilation.FunctionCompiler;
 import somelanguage.Interpreter.Compilation.Compiler;
 import somelanguage.Variables.ComplexScope;
-import somelanguage.Parser.Token.Token;
-import somelanguage.Parser.Token.TokenType;
-import somelanguage.Parser.Token.Tokens;
-import somelanguage.Value.BooleanValue;
-import somelanguage.Value.FunctionValue;
-import somelanguage.Value.NullValue;
-import somelanguage.Value.UserFunctionValue;
-import somelanguage.Value.Value;
-import somelanguage.Value.StringValue;
+import somelanguage.Parser.Token.*;
+import somelanguage.Value.*;
 
 /**
- * Proccesses a list of tokens and evaluates them to a single value
+ * Processes a list of tokens and evaluates them to a single value
  * @author tylercarter
  */
 public class ExpressionProcessor {
@@ -39,6 +33,7 @@ public class ExpressionProcessor {
         // Add Compiler Operations
         this.compilers.add(new FunctionCompiler());
         this.compilers.add(new CallingCompiler());
+        this.compilers.add(new BracketCompiler());
     }
 
     /*
@@ -59,25 +54,25 @@ public class ExpressionProcessor {
         if(tokens.isEmpty())
             return new NullValue();
 
-        // Do Compile
+        // Do Compile Processes
         for(Compiler compiler:this.compilers){
             compiler.compile(tokens, scope, this);
         }
         
-        // Math
-        doBrackets(tokens, scope);
-
+        // Evaluate Expression
         for(MathOperation op:this.operations){
             op.doOperation(tokens, scope);
         }
         
         doAssignment(tokens, scope);
 
+        // Clean Up
+        
         // Get rid of excess end statements
         cleanEndStatements(tokens);
 
         if(tokens.size() > 1){
-            System.out.println(tokens);
+            System.out.println("Bad Tokens: " + tokens);
             throw new Exception("Badly Formed Expression.");
         }
 
@@ -96,37 +91,6 @@ public class ExpressionProcessor {
         }else{
             return token.getTokenValue();
         }
-    }
-
-
-    /*
-     * Searches for bracketed expressions and evaluates them
-     */
-    private void doBrackets(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
-
-        if(tokens.isEmpty())
-            return; 
-
-        for(int i = 0; i < tokens.size(); i++){
-
-            Token token = tokens.get(i);
-
-            if(token.getTokenType() == TokenType.CLOSEBRACKET){
-                throw new Exception("Unmatched Close Bracket.");
-            }
-
-            else if(token.getTokenType() == TokenType.OPENBRACKET)
-            {
-
-                ArrayList<Token> subExpression = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i);
-
-                // Evaluate the expression and insert it in place of the expression
-                tokens.add(i, new Token(TokenType.INTEGER, evaluate(subExpression, scope)));
-            }
-
-        }
-
-        return;
     }
 
     /*
@@ -168,8 +132,6 @@ public class ExpressionProcessor {
         }
 
     }
-
-     
 
     private void cleanEndStatements(ArrayList<Token> tokens) {
         for(int i = 0; i < tokens.size(); i++){
