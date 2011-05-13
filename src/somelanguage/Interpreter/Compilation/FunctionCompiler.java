@@ -97,7 +97,7 @@ public class FunctionCompiler implements Compiler {
                         }
 
                         try{
-                            argumentValues.add((StringValue) parameterValues.get(x).get(0).getTokenValue());
+                            argumentValues.add(new StringValue(parameterValues.get(x).get(0).getTokenValue().toString()));
                         }catch(ClassCastException ex){
                             throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
                         }
