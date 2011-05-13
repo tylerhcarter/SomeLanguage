@@ -9,10 +9,12 @@ import somelanguage.Parser.Token.TokenType;
 public class Keyword {
     private final String keyword;
     private final TokenType tokenType;
+    private final boolean breaking;
 
-    public Keyword(String keyword, TokenType tokenType){
+    public Keyword(String keyword, TokenType tokenType, boolean breaking){
         this.keyword = keyword;
         this.tokenType = tokenType;
+        this.breaking = breaking;
     }
 
     /**
@@ -27,6 +29,10 @@ public class Keyword {
      */
     public TokenType getTokenType() {
         return tokenType;
+    }
+
+    public boolean isBreaking(){
+        return breaking;
     }
 
 }

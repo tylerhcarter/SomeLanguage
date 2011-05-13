@@ -17,7 +17,12 @@ public class Configuration {
     }
 
     public void addKeyword(String search, TokenType token){
-        Keyword keyword = new Keyword(search, token);
+        Keyword keyword = new Keyword(search, token, false);
+        this.keywords.add(keyword);
+    }
+    
+    public void addKeyword(String search, TokenType token, boolean breaking){
+        Keyword keyword = new Keyword(search, token, breaking);
         this.keywords.add(keyword);
     }
 

@@ -33,8 +33,26 @@ public class Parser{
 
     public ArrayList<Token> parse(String text) {
 
+        // Split by newlines
+        String[] strings = text.split("\n");
+
+        for(String string:strings){
+            if(string.startsWith("//"))
+                continue;
+            else
+                parseLine(string);
+        }
+
+        return this.tokens;
+    }
+
+    public ArrayList<Token> parseLine(String text) {
+
         // Add an end statement
         text += ";";
+
+        // Remove Newlines
+        text = text.replace("\n", "");
 
         // Split up everything
         String[] strings = text.split("");
@@ -127,8 +145,12 @@ public class Parser{
     private Token convertKeyword(String string) {
 
         for(Keyword keyword:(Iterable<Keyword>)this.keywords){
-            if(keyword.getKeyword().equals(string))
+            if(keyword.getKeyword().equals(string)){
+                if(keyword.isBreaking()){
+                    this.tokens.add(new Token(TokenType.END_STATEMENT));
+                }
                 return new Token(keyword.getTokenType());
+            }
         }
         
         throw new IllegalArgumentException("Input is not a valid keyword.");

@@ -64,7 +64,7 @@ public class Processor {
             }
         }
 
-
+        // If nothing matches, evaluate as a regular expression
         return evaluateOperation(statement.getTokens(), fullScope);
         
     }

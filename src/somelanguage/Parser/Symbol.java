@@ -9,7 +9,7 @@ import somelanguage.Parser.Token.TokenType;
 public class Symbol extends Keyword {
 
     public Symbol(String keyword, TokenType tokenType){
-        super(keyword, tokenType);
+        super(keyword, tokenType, false);
     }
 
 }

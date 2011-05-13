@@ -96,30 +96,29 @@ public class Main {
     public static somelanguage.Parser.Configuration getParserConfig(){
         somelanguage.Parser.Configuration pConfig = new somelanguage.Parser.Configuration();
 
-        // Create Keywords
-        pConfig.addKeyword("global", TokenType.GLOBAL_DECLARE);
-        pConfig.addKeyword("var", TokenType.LOCAL_DECLARE);
-        pConfig.addKeyword("variable", TokenType.LOCAL_DECLARE);
-        pConfig.addKeyword("make", TokenType.LOCAL_DECLARE);
+        // Basic Keywords
+        pConfig.addKeyword("global", TokenType.GLOBAL_DECLARE, true);
+        pConfig.addKeyword("var", TokenType.LOCAL_DECLARE, true);
         pConfig.addKeyword("function", TokenType.FUNCTION_DECLARE);
-        pConfig.addKeyword("create", TokenType.FUNCTION_DECLARE);
-        pConfig.addKeyword("return", TokenType.RETURN);
-        pConfig.addKeyword("if", TokenType.IF);
+        pConfig.addKeyword("return", TokenType.RETURN, true);
+        pConfig.addKeyword("if", TokenType.IF, true);
         pConfig.addKeyword("elif", TokenType.ELIF);
-        pConfig.addKeyword("eli", TokenType.ELIF);
-        pConfig.addKeyword("el", TokenType.ELIF);
         pConfig.addKeyword("else", TokenType.ELSE);
-        pConfig.addKeyword("els", TokenType.ELSE);
-
-        pConfig.addKeyword("echo", TokenType.ECHO);
-        pConfig.addKeyword("say", TokenType.ECHO);
-        pConfig.addKeyword("speak", TokenType.ECHO);
-
-        // Create Symbols
+        pConfig.addKeyword("echo", TokenType.ECHO, true);
+        
+        // Comon Symbols
         pConfig.addSymbol(";", TokenType.END_STATEMENT);
+        pConfig.addSymbol("\"", TokenType.QUOTE);
+        pConfig.addSymbol(",", TokenType.COMMA);
+        
+        // General Operators
+        pConfig.addSymbol("+", TokenType.ADD);
+        pConfig.addSymbol("-", TokenType.SUBTRACT);
+        pConfig.addSymbol("*", TokenType.MULTIPLY);
+        pConfig.addSymbol("/", TokenType.DIVIDE);
         pConfig.addSymbol("=", TokenType.ASSIGNMENT);
-        pConfig.addKeyword("equals", TokenType.ASSIGNMENT);
-        pConfig.addKeyword("equal", TokenType.ASSIGNMENT);
+        
+        // Equality Operators
         pConfig.addSymbol("==", TokenType.EQUALITY);
         pConfig.addSymbol("&&", TokenType.AND);
         pConfig.addSymbol("&", TokenType.AND);
@@ -127,19 +126,27 @@ public class Main {
         pConfig.addSymbol("||", TokenType.OR);
         pConfig.addSymbol("|", TokenType.OR);
         pConfig.addKeyword("OR", TokenType.OR);
-        pConfig.addSymbol("+", TokenType.ADD);
-        pConfig.addKeyword("plus", TokenType.ADD);
-        pConfig.addSymbol("-", TokenType.SUBTRACT);
-        pConfig.addKeyword("minus", TokenType.SUBTRACT);
-        pConfig.addSymbol("*", TokenType.MULTIPLY);
-        pConfig.addKeyword("times", TokenType.MULTIPLY);
-        pConfig.addSymbol("/", TokenType.DIVIDE);
-        pConfig.addSymbol("\"", TokenType.QUOTE);
-        pConfig.addSymbol(",", TokenType.COMMA);
+
+        // Structural Symbols
         pConfig.addSymbol("(", TokenType.OPENBRACKET);
         pConfig.addSymbol(")", TokenType.CLOSEBRACKET);
         pConfig.addSymbol("{", TokenType.OPENBRACES);
         pConfig.addSymbol("}", TokenType.CLOSEBRACES);
+
+        // Extra
+        pConfig.addKeyword("variable", TokenType.LOCAL_DECLARE);
+        pConfig.addKeyword("make", TokenType.LOCAL_DECLARE);
+        pConfig.addKeyword("create", TokenType.FUNCTION_DECLARE);
+        pConfig.addKeyword("equals", TokenType.ASSIGNMENT);
+        pConfig.addKeyword("equal", TokenType.ASSIGNMENT);
+        pConfig.addKeyword("plus", TokenType.ADD);
+        pConfig.addKeyword("minus", TokenType.SUBTRACT);
+        pConfig.addKeyword("times", TokenType.MULTIPLY);
+        pConfig.addKeyword("say", TokenType.ECHO);
+        pConfig.addKeyword("speak", TokenType.ECHO);
+        pConfig.addKeyword("els", TokenType.ELSE);
+        pConfig.addKeyword("eli", TokenType.ELIF);
+        pConfig.addKeyword("el", TokenType.ELIF);
 
         return pConfig;
     }
@@ -149,21 +156,18 @@ public class Main {
         while(true){
 
             int returnIndex = text.indexOf("\r");
-            int newlineIndex = text.indexOf("\n");
             int tabIndex = text.indexOf("\t");
 
             int index;
             if(returnIndex != -1){
                 index = returnIndex;
-            }else if(newlineIndex != -1){
-                index = newlineIndex;
             }else if(tabIndex != -1){
                 index = tabIndex;
             }else{
                 break;
             }
 
-            text = text.substring(0, index) + " " + text.substring(index + "\r".length());
+            text = text.substring(0, index) + "\n" + text.substring(index + "\r".length());
         }
 
         return text;
