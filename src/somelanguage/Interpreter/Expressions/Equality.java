@@ -1,5 +1,6 @@
 package somelanguage.Interpreter.Expressions;
 
+import somelanguage.Interpreter.TypeException;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.BooleanValue;
@@ -32,13 +33,13 @@ public class Equality extends MathOperation {
         try{
             numerator = (Value) expression.getNumerator();
         }catch(ClassCastException ex){
-            throw new Exception("Could not convert " + expression.getNumerator().getType() + " to Value.");
+            throw new TypeException("Could not convert " + expression.getNumerator().getType() + " to Value.", expression.getNumerator());
         }
 
         try{
             denominator = (Value) expression.getDenominator();
         }catch(ClassCastException ex){
-            throw new Exception("Could not convert " + expression.getDenominator().getType() + " to Value.");
+            throw new TypeException("Could not convert " + expression.getDenominator().getType() + " to Value.", expression.getDenominator());
         }
 
         // Check if they are the same type

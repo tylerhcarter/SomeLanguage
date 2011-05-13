@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package somelanguage.Interpreter.Compilation;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Expressions.ExpressionProcessor;
+import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
 import somelanguage.Value.*;
@@ -17,17 +13,14 @@ import somelanguage.Value.*;
  */
 public class CallingCompiler implements Compiler{
 
-    public void compile(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception{
-
-        if(tokens.isEmpty())
-            return;
+    public void process(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception{
 
         for(int i = 0; i < tokens.size() - 1; i++){
 
             Token token = tokens.get(i);
 
             if(token.getTokenType() == TokenType.CLOSEBRACKET){
-                throw new Exception("Unmatched Close Bracket.");
+                throw new SyntaxException("Unmatched Close Bracket.", tokens);
             }
 
             else if(token.getTokenType() == TokenType.USERFUNC){
@@ -40,7 +33,7 @@ public class CallingCompiler implements Compiler{
                     value = (FunctionValue) v;
                 }catch(ClassCastException ex){
                     System.out.println(ex);
-                    throw new Exception("Attempted to call a non-function.");
+                    throw new SyntaxException("Attempted to call a non-function.", tokens);
                 }
 
                 ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
@@ -81,7 +74,6 @@ public class CallingCompiler implements Compiler{
                 // Get Variable Name
                 String name = token.getTokenValue().toString();
 
-                System.out.println(scope.getLocal());
                 // Get Variable Value
                 Value v = scope.getVariable(name).getValue();
 
@@ -91,7 +83,7 @@ public class CallingCompiler implements Compiler{
                     value = (FunctionValue) v;
                 }catch(ClassCastException ex){
                     System.out.println(ex);
-                    throw new Exception("Attempted to call a non-function.");
+                    throw new SyntaxException("Attempted to call a non-function.", tokens);
                 }
 
                 ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);

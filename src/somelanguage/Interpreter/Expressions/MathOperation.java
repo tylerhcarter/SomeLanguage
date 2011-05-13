@@ -1,6 +1,7 @@
 package somelanguage.Interpreter.Expressions;
 
 import java.util.ArrayList;
+import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.Value;
@@ -21,7 +22,7 @@ public abstract class MathOperation {
 
     protected abstract Token evaluateExpression(Expression expression, ComplexScope scope) throws Exception;
 
-    public void doOperation(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    public void process(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         for(int i = 0; i < tokens.size(); i++){
 
@@ -32,13 +33,13 @@ public abstract class MathOperation {
 
                 // Get the value before
                 if((i - 1) < 0){
-                    throw new Exception ("Badly Formed Expression.");
+                    throw new SyntaxException ("Badly Formed Expression.", tokens);
                 }
                 Value numerator = this.engine.evaluate(tokens.get(i - 1), scope);
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
-                    throw new Exception ("Badly Formed Expression.");
+                    throw new SyntaxException ("Badly Formed Expression.", tokens);
                 }
                 Value divisor = this.engine.evaluate(tokens.get(i + 1), scope);
 

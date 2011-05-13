@@ -16,6 +16,6 @@ import somelanguage.Variables.ComplexScope;
  */
 public interface Compiler {
 
-    void compile(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception;
+    void process(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception;
 
 }

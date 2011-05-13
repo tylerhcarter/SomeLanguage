@@ -2,6 +2,7 @@ package somelanguage.Interpreter.Compilation;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Expressions.ExpressionProcessor;
+import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
 import somelanguage.Value.*;
@@ -15,22 +16,17 @@ public class FunctionCompiler implements Compiler {
     /*
      * Converts function declarations into function references
      */
-    public void compile(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception {
+    public void process(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception {
 
         for(int i = 0; i < tokens.size(); i++){
             Token token = tokens.get(i);
-            System.out.println(token);
             if(token.getTokenType() == TokenType.FUNCTION_DECLARE){
 
                 // Remove the function declare
                 tokens.remove(i);
 
                 // Get function
-                Value value = getFunction(tokens, scope);
-                String name = ((FunctionValue) value).getName();
-
-                // Add reference to global scope
-                scope.global.addVariable(name, value);
+                FunctionValue value = getFunction(tokens, scope);
                 
                 // Add reference to statement
                 tokens.add(i, new Token(TokenType.USERFUNC, value));
@@ -44,7 +40,7 @@ public class FunctionCompiler implements Compiler {
     /*
      * Removes tokens inside of a function delcaration and returns them
      */
-    private Value getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    private FunctionValue getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Get Parameters
         ArrayList<StringValue> parameters = getParameters(tokens);
@@ -66,72 +62,74 @@ public class FunctionCompiler implements Compiler {
             // Look for opening brace
             if(token.getTokenType() == TokenType.OPENBRACKET){
 
-                // Get all braces between
-                ArrayList<Token> parameterTokens = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i);
+                ArrayList<ArrayList<Token>> values = parseParameters(tokens, i);
 
-                // Separate by comma
-                ArrayList<ArrayList<Token>> parameterValues = new ArrayList<ArrayList<Token>>();
+                ArrayList<StringValue> names = new ArrayList<StringValue>();
+                if(!values.isEmpty()){
+                    for(int x = 0; x < values.size(); x++){
 
-                parameterValues.add(new ArrayList<Token>());
-                int k = 0;
-                for(int o = 0; o < parameterTokens.size(); o++){
+                        if(values.get(x).isEmpty())
+                            throw new SyntaxException("Badly Formed Parameter List. Expecting Parameter Name.", tokens);
 
-                    if(parameterTokens.get(o).getTokenType() == TokenType.COMMA){
-                        parameterValues.add(new ArrayList<Token>());
-                        k++;
-                    }else{
-                        parameterValues.get(k).add(parameterTokens.get(o));
-                    }
+                        if(values.get(x).size() > 1)
+                            throw new SyntaxException("Badly Formed Parameter List. Expecting , or ).", tokens);
 
-                }
+                        Value value = values.get(x).get(0).getTokenValue();
 
-                ArrayList<StringValue> argumentValues = new ArrayList<StringValue>();
-                if(!parameterValues.isEmpty()){
-                    for(int x = 0; x < parameterValues.size(); x++){
-                        if(parameterValues.get(x).size() == 0){
-                            continue;
-                        }
-
-                        if(parameterValues.get(x).size() > 1){
-                            throw new Exception("Badly Formed Parameter List");
-                        }
-
+                        // Try to convert to a string value
                         try{
-                            argumentValues.add(new StringValue(parameterValues.get(x).get(0).getTokenValue().toString()));
+                            StringValue name = new StringValue( value.toString() );
+                            names.add(name);
                         }catch(ClassCastException ex){
-                            throw new Exception("Expecting STRING found" + parameterValues.get(0).get(0).getTokenValue().getType());
+                            throw new SyntaxException("Expecting STRING found" + value.getType(), tokens);
                         }
+                        
                     }
+
                 }
-
-                return argumentValues;
-
+                return names;
             }
+        }
+        throw new Exception("Did not find parameter list.");
+
+    }
+
+    private ArrayList<ArrayList<Token>> parseParameters(ArrayList<Token> tokens, int index) throws Exception{
+
+        ArrayList<Token> pTokens = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, index);
+
+        ArrayList<ArrayList<Token>> parameterValues = new ArrayList<ArrayList<Token>>();
+
+        // Separate tokens by comma
+        parameterValues.add(new ArrayList<Token>());
+        int parameterCount = 0;
+        for(int i = 0; i < pTokens.size(); i++){
+            Token token = pTokens.get(i);
+
+            if(token.getTokenType() == TokenType.COMMA){
+                parameterCount++;
+                parameterValues.add(new ArrayList<Token>());
+                continue;
+            }
+
+            parameterValues.get(parameterCount).add(pTokens.get(i));
 
         }
 
-        throw new Exception("Did not find parameter list.");
-
+        return parameterValues;
     }
 
     private ArrayList<Token> getBody(ArrayList<Token> tokens) throws Exception{
 
         for(int i = 0; i < tokens.size(); i++){
-
+            
             Token token = tokens.get(i);
-
             // Look for opening brace
-            if(token.getTokenType() == TokenType.OPENBRACES){
-
-                // Get all braces between
+            if(token.getTokenType() == TokenType.OPENBRACES)
                 return Tokens.sliceBody(tokens, TokenType.OPENBRACES, i);
-
-            }
-
+            
         }
-
         throw new Exception("Could not find function body.");
-
     }
 
 }

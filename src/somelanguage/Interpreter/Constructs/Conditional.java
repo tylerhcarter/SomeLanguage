@@ -2,6 +2,7 @@ package somelanguage.Interpreter.Constructs;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Processor;
+import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Parser.Token.Tokens;
@@ -120,7 +121,7 @@ public class Conditional extends Construct{
         try{
             proceed = (BooleanValue) value;
         }catch(ClassCastException ex){
-            System.out.println("Could not convert conditional to boolean.");
+            throw new SyntaxException("Could not convert conditional to boolean.", tokens);
         }
 
         return proceed.getValue();

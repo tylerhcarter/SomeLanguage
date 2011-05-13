@@ -5,6 +5,7 @@ import somelanguage.Interpreter.Compilation.BracketCompiler;
 import somelanguage.Interpreter.Compilation.CallingCompiler;
 import somelanguage.Interpreter.Compilation.FunctionCompiler;
 import somelanguage.Interpreter.Compilation.Compiler;
+import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
 import somelanguage.Value.*;
@@ -51,29 +52,25 @@ public class ExpressionProcessor {
      */
     public Value evaluate(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
-        if(tokens.isEmpty())
-            return new NullValue();
+        if(tokens.isEmpty()) return new NullValue();
 
         // Do Compile Processes
-        for(Compiler compiler:this.compilers){
-            compiler.compile(tokens, scope, this);
-        }
+        for(Compiler compiler:this.compilers)
+            compiler.process(tokens, scope, this);
         
         // Evaluate Expression
-        for(MathOperation op:this.operations){
-            op.doOperation(tokens, scope);
-        }
-        
-        doAssignment(tokens, scope);
+        for(MathOperation op:this.operations)
+            op.process(tokens, scope);
 
-        // Clean Up
+        // Assign variables
+        doAssignment(tokens, scope);
         
         // Get rid of excess end statements
         cleanEndStatements(tokens);
 
+        // Check that we only have one token left
         if(tokens.size() > 1){
-            System.out.println("Bad Tokens: " + tokens);
-            throw new Exception("Badly Formed Expression.");
+            throw new SyntaxException("Badly Formed Expression.", tokens);
         }
 
         return getToken(tokens, 0, scope);
@@ -83,6 +80,7 @@ public class ExpressionProcessor {
      * Returns token's value
      */
     private Value getToken(ArrayList<Token> tokens, int i, ComplexScope scope) throws Exception {
+
         Token token = tokens.get(i);
         if(token.getTokenType() == TokenType.STRING){
             Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString()).getValue();
@@ -91,6 +89,7 @@ public class ExpressionProcessor {
         }else{
             return token.getTokenValue();
         }
+        
     }
 
     /*
@@ -108,13 +107,13 @@ public class ExpressionProcessor {
 
                 // Check Left
                 if((i - 1) < 0){
-                    throw new Exception ("Expected STRING, found ADD");
+                    throw new SyntaxException ("Expected STRING, found ASSIGNMENT", tokens);
                 }
                 String name = tokens.get(i - 1).getTokenValue().toString();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
-                    throw new Exception ("Expected INTEGER, found END_STATEMENT");
+                    throw new SyntaxException ("Expected INTEGER, found END_STATEMENT", tokens);
                 }
 
                 Value value = getToken(tokens, i+1, scope);

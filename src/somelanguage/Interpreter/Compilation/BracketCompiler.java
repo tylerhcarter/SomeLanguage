@@ -2,6 +2,7 @@ package somelanguage.Interpreter.Compilation;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Expressions.ExpressionProcessor;
+import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
 
@@ -11,14 +12,14 @@ import somelanguage.Parser.Token.*;
  */
 public class BracketCompiler implements Compiler{
 
-    public void compile(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception{
+    public void process(ArrayList<Token> tokens, ComplexScope scope, ExpressionProcessor processor) throws Exception{
 
         for(int i = 0; i < tokens.size(); i++){
 
             Token token = tokens.get(i);
 
             if(token.getTokenType() == TokenType.CLOSEBRACKET){
-                throw new Exception("Unmatched Close Bracket.");
+                throw new SyntaxException("Unmatched Close Bracket.", tokens);
             }
 
             else if(token.getTokenType() == TokenType.OPENBRACKET)

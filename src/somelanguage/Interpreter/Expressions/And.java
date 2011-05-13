@@ -1,5 +1,6 @@
 package somelanguage.Interpreter.Expressions;
 
+import somelanguage.Interpreter.TypeException;
 import somelanguage.Parser.Token.Token;
 import somelanguage.Parser.Token.TokenType;
 import somelanguage.Value.BooleanValue;
@@ -28,13 +29,13 @@ public class And extends MathOperation {
         try{
             numerator = (BooleanValue) expression.getNumerator();
         }catch(ClassCastException ex){
-            throw new Exception("Could not convert " + expression.getNumerator().getType() + " to IntegerValue.");
+            throw new TypeException("Could not convert " + expression.getNumerator().getType() + " to IntegerValue.", expression.getNumerator());
         }
 
         try{
             denominator = (BooleanValue) expression.getDenominator();
         }catch(ClassCastException ex){
-            throw new Exception("Could not convert " + expression.getDenominator().getType() + " to IntegerValue.");
+            throw new TypeException("Could not convert " + expression.getDenominator().getType() + " to IntegerValue.", expression.getDenominator());
         }
 
         if(numerator.getValue() == true && denominator.getValue() == true){
