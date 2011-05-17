@@ -1,2 +1,6 @@
-var test = "Mello Hello";
-say test;
+var test = {
+    "field" : {
+        "hello" : "world
+    },
+    "field1" : "value1"
+};

@@ -5,6 +5,8 @@ import somelanguage.Interpreter.Compilation.BracketCompiler;
 import somelanguage.Interpreter.Compilation.CallingCompiler;
 import somelanguage.Interpreter.Compilation.FunctionCompiler;
 import somelanguage.Interpreter.Compilation.Compiler;
+import somelanguage.Interpreter.Compilation.ObjectCompiler;
+import somelanguage.Interpreter.Compilation.ReferenceCompiler;
 import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
@@ -34,6 +36,8 @@ public class ExpressionProcessor {
         // Add Compiler Operations
         this.compilers.add(new FunctionCompiler());
         this.compilers.add(new CallingCompiler());
+        this.compilers.add(new ObjectCompiler());
+        //this.compilers.add(new ReferenceCompiler());
         this.compilers.add(new BracketCompiler());
     }
 

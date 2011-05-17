@@ -167,4 +167,13 @@ public class Tokens {
         return -1;
      }
 
+     public static void cleanEndStatements(ArrayList<Token> tokens) {
+        for(int i = 0; i < tokens.size(); i++){
+            if(tokens.get(i).getTokenType() == TokenType.END_STATEMENT){
+                tokens.remove(i);
+                i = -1;
+            }
+        }
+    }
+
 }

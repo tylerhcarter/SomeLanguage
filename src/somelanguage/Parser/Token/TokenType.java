@@ -26,7 +26,9 @@ public enum TokenType {
     CLOSEBRACES,
 
     COMMA,
-
+    COLON,
+    DOT,
+    
     INTEGER,
     STRING,
     ENCAPSULATED_STRING,
@@ -40,6 +42,7 @@ public enum TokenType {
     BOOLEAN,
     RETURN,   
     USERFUNC,
+    OBJECT,
 
     AND,
     OR,

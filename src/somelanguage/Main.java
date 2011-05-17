@@ -39,7 +39,7 @@ public class Main {
         
         try {
             
-            String text = readFile("/Users/tylercarter/Code/SomeLanguage/src/somelanguage/file.txt");
+            String text = readFile("/media/2EB25B2BB25AF735/cha_java/SomeLanguage/src/somelanguage/file.txt");
             text = cleanCode(text);
             ArrayList<Token> tokens = parser.parse(text);
 
@@ -107,6 +107,8 @@ public class Main {
         pConfig.addKeyword("echo", TokenType.ECHO, true);
         
         // Comon Symbols
+        pConfig.addSymbol(".", TokenType.DOT);
+        pConfig.addSymbol(":", TokenType.COLON);
         pConfig.addSymbol(";", TokenType.END_STATEMENT);
         pConfig.addSymbol("\"", TokenType.QUOTE);
         pConfig.addSymbol(",", TokenType.COMMA);
