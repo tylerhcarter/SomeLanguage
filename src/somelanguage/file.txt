@@ -1,5 +1,5 @@
 var test = {
-    "test" : "test
+    "test" : "test"
 };
 
 say test.test;

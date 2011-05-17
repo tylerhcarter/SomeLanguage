@@ -33,7 +33,7 @@ public class ReferenceCompiler implements Compiler {
                         throw new SyntaxException("Expecting String Indentifier.", tokens);
                     }
 
-                    String identifier = tokens.get(i + 2).toString();
+                    String identifier = tokens.get(i + 2).getTokenValue().toString();
 
                     // Get Variable Container
                     VariableValue container = (VariableValue) token.getTokenValue();
@@ -43,8 +43,6 @@ public class ReferenceCompiler implements Compiler {
 
                     // Get Object Member
                     Value value = object.getValue(identifier);
-
-                    System.out.println(object.toString());
 
                     // Replace
                     tokens.remove(i);

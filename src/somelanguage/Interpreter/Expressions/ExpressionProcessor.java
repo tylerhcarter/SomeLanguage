@@ -114,7 +114,7 @@ public class ExpressionProcessor {
                 if((i - 1) < 0){
                     throw new SyntaxException ("Expected STRING, found ASSIGNMENT", tokens);
                 }
-                System.out.println(tokens);
+                
                 VariableValue variable = (VariableValue) tokens.get(i - 1).getTokenValue();
 
                 // Check Right

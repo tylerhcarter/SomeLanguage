@@ -42,7 +42,7 @@ public class EncapsulatedString extends Value{
 
         }
 
-        return output;
+        return output.trim();
     }
 
     @Override

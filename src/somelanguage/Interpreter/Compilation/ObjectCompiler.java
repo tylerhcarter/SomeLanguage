@@ -95,7 +95,7 @@ public class ObjectCompiler implements Compiler {
             throw new SyntaxException("Expected String.", field);
         }
 
-        name = field.get(0).toString();
+        name = field.get(0).getTokenValue().toString();
 
         // Next we need a colon
         if(field.get(1).getTokenType() != TokenType.COLON){
