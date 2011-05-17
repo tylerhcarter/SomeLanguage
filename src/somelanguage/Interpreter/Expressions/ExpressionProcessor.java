@@ -36,9 +36,9 @@ public class ExpressionProcessor {
 
         // Add Compiler Operations
         this.compilers.add(new FunctionCompiler());
+        this.compilers.add(new ReferenceCompiler());
         this.compilers.add(new CallingCompiler());
         this.compilers.add(new ObjectCompiler());
-        this.compilers.add(new ReferenceCompiler());
         this.compilers.add(new BracketCompiler());
     }
 

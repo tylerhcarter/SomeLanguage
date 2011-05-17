@@ -25,6 +25,12 @@ public class CallingCompiler implements Compiler{
 
             else if(token.getTokenType() == TokenType.USERFUNC){
 
+                // Skip if no brackets are afterwards
+                if(tokens.size() <= i + 1)
+                    continue;
+                if(tokens.get(i + 1).getTokenType() != TokenType.OPENBRACKET)
+                    continue;
+
                 Value v = token.getTokenValue();
 
                 // Convert Variable Value to FunctionValue
@@ -35,7 +41,7 @@ public class CallingCompiler implements Compiler{
                     System.out.println(ex);
                     throw new SyntaxException("Attempted to call a non-function.", tokens);
                 }
-
+                
                 ArrayList<Token> statement = Tokens.sliceBody(tokens, TokenType.OPENBRACKET, i + 1);
                 tokens.remove(i);
 

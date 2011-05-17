@@ -2,6 +2,7 @@ package somelanguage.Interpreter.Compilation;
 
 import java.util.ArrayList;
 import somelanguage.Interpreter.Expressions.ExpressionProcessor;
+import somelanguage.Interpreter.Function;
 import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
@@ -25,11 +26,10 @@ public class FunctionCompiler implements Compiler {
                 // Remove the function declare
                 tokens.remove(i);
 
+                System.out.println(tokens);
+
                 // Get function
-                FunctionValue value = getFunction(tokens, scope);
-                
-                // Add reference to statement
-                tokens.add(i, new Token(TokenType.USERFUNC, value));
+                replaceFunction(i, tokens, scope);
 
                 i = 0;
             }
@@ -40,16 +40,19 @@ public class FunctionCompiler implements Compiler {
     /*
      * Removes tokens inside of a function delcaration and returns them
      */
-    private FunctionValue getFunction(ArrayList<Token> tokens, ComplexScope scope) throws Exception{
+    private void replaceFunction(int index, ArrayList<Token> tokens, ComplexScope scope) throws Exception{
 
         // Get Parameters
         ArrayList<StringValue> parameters = getParameters(tokens);
 
         // Get function body
-        ArrayList<Token> body = getBody(tokens);
+        ArrayList<Token> body = getBody(index, tokens);
 
         // Return them as a function
-        return new UserFunctionValue(body, parameters, scope);
+        UserFunctionValue func = new UserFunctionValue(body, parameters, scope);
+
+        // Add reference to statement
+        tokens.add(index, new Token(TokenType.USERFUNC, func));
 
     }
 
@@ -119,9 +122,9 @@ public class FunctionCompiler implements Compiler {
         return parameterValues;
     }
 
-    private ArrayList<Token> getBody(ArrayList<Token> tokens) throws Exception{
+    private ArrayList<Token> getBody(int startIndex, ArrayList<Token> tokens) throws Exception{
 
-        for(int i = 0; i < tokens.size(); i++){
+        for(int i = startIndex; i < tokens.size(); i++){
             
             Token token = tokens.get(i);
             // Look for opening brace

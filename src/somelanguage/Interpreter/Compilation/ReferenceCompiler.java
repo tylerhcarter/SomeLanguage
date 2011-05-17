@@ -48,8 +48,8 @@ public class ReferenceCompiler implements Compiler {
                     tokens.remove(i);
                     tokens.remove(i);
                     tokens.remove(i);
-                    tokens.add(value.toToken());
-                    
+                    tokens.add(i, value.toToken());
+
                     i = 0;
                 }
                 
