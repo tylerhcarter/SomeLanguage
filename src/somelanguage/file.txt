@@ -1,6 +1,5 @@
 var test = {
-    "field" : {
-        "hello" : "world
-    },
-    "field1" : "value1"
+    "test" : "test
 };
+
+say test.test;

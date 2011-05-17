@@ -11,6 +11,7 @@ import somelanguage.Interpreter.SyntaxException;
 import somelanguage.Variables.ComplexScope;
 import somelanguage.Parser.Token.*;
 import somelanguage.Value.*;
+import somelanguage.Variables.VariableValue;
 
 /**
  * Processes a list of tokens and evaluates them to a single value
@@ -37,7 +38,7 @@ public class ExpressionProcessor {
         this.compilers.add(new FunctionCompiler());
         this.compilers.add(new CallingCompiler());
         this.compilers.add(new ObjectCompiler());
-        //this.compilers.add(new ReferenceCompiler());
+        this.compilers.add(new ReferenceCompiler());
         this.compilers.add(new BracketCompiler());
     }
 
@@ -87,7 +88,7 @@ public class ExpressionProcessor {
 
         Token token = tokens.get(i);
         if(token.getTokenType() == TokenType.STRING){
-            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString()).getValue();
+            Value value = scope.getVariable(((StringValue) token.getTokenValue()).toString());
             return value;
 
         }else{
@@ -109,11 +110,12 @@ public class ExpressionProcessor {
             // Check if this is a divider
             if(token.getTokenType() == TokenType.ASSIGNMENT){
 
-                // Check Left
+                // Check Left for variable container
                 if((i - 1) < 0){
                     throw new SyntaxException ("Expected STRING, found ASSIGNMENT", tokens);
                 }
-                String name = tokens.get(i - 1).getTokenValue().toString();
+                System.out.println(tokens);
+                VariableValue variable = (VariableValue) tokens.get(i - 1).getTokenValue();
 
                 // Check Right
                 if((i + 1) >= tokens.size()){
@@ -123,7 +125,7 @@ public class ExpressionProcessor {
                 Value value = getToken(tokens, i+1, scope);
 
                 // Divide and replace with new token
-                scope.setVariable(name, value);
+                variable.setValue(value);
 
                 Tokens.slice(tokens, i-1, i+1);
                 tokens.add(i - 1, new Token(TokenType.BOOLEAN, new BooleanValue("true")));

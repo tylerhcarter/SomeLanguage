@@ -1,12 +1,14 @@
 package somelanguage.Variables;
 
+import somelanguage.Parser.Token.Token;
 import somelanguage.Value.Value;
+import somelanguage.Value.ValueType;
 
 /**
  *
  * @author tylercarter
  */
-public class VariableValue {
+public class VariableValue extends Value {
 
     private Value value;
 
@@ -26,6 +28,17 @@ public class VariableValue {
 
     public String toString(){
         return this.value.toString();
+    }
+
+    @Override
+    public ValueType getType() {
+        return this.value.getType();
+    }
+
+    @Override
+    public Token toToken() {
+        Token token = this.value.toToken();
+        return new Token(token.getTokenType(), this);
     }
 
 }
